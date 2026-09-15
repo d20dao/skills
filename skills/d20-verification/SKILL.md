@@ -3,7 +3,7 @@ name: d20-verification
 description: Verify D20 API3 epoch commitments, fixed-key VRF evidence and mappings against independently trusted chain context.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `67d6b0113c92d860b3771ba9e496fa716d17d9ec`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
 
 Read target AGENTS.md, SDK declarations/provenance and current replay, epoch, evidence, verification and mapping source. Match the reviewed commit and deployed configuration. Use public helpers only; keep signer keys outside the verifier. The private alpha is not an approved production service.
 

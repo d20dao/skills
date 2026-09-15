@@ -3,7 +3,7 @@ name: d20-lifecycle
 description: Diagnose D20 epoch admission, VRF acceptance deadlines, callback retries and fixed-recipient refunds from chain state.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `67d6b0113c92d860b3771ba9e496fa716d17d9ec`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
 
 Read target AGENTS.md, ArcVRFCoordinator.sol, EpochEntropy.sol and actual ABI. Match the SDK provenance commit and deployed configuration. The alpha is not an approved production service. Logs/UI labels are observations; trusted receipts and chain state establish status.
 
@@ -19,6 +19,6 @@ Each 200-block epoch must commit signed API3 data before starting. No current co
 
 The deadline is requestedAt +60 seconds. Inclusion exactly at the deadline is timely; refund requires strictly later. Use actual inclusion timestamp and finality/reorg policy, not browser time or submission time. Keep key/input/mapping/epoch fixed.
 
-Recovery functions are in the full coordinator ABI, not the smaller IArcVRF interface. Separate RNG fees, delivery and game-payment accounting. Diagnose ambiguous transaction outcomes before retrying. Prepare a concrete target, recipient and effect for authorized recovery; read-only diagnosis does not authorize gas spending.
+Recovery functions are in the full coordinator ABI, not the smaller IArcVRF interface. Separate RNG fees, delivery and application-payment accounting. Diagnose ambiguous transaction outcomes before retrying. Prepare a concrete target, recipient and effect for authorized recovery; read-only diagnosis does not authorize gas spending.
 
 Do not treat a healthy keeper flag as proof of active epoch availability: the healthy-with-missing-epoch readiness gap remains open. Read registry admission state directly. After resolved-history compaction, retained IDs/hashes help locate chain evidence, but the keeper may no longer retain the raw replay packet.

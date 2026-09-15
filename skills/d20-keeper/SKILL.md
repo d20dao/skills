@@ -3,11 +3,11 @@ name: d20-keeper
 description: Configure and recover the outbound D20 keeper and epoch publisher while preserving commitments, persisted proofs, nonce ownership and expiry.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `67d6b0113c92d860b3771ba9e496fa716d17d9ec`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
 
 Read target AGENTS.md, keeper/README.md, .env.example and keeper/MIGRATION.md for migration; use deploy/docker/README.md for containers. Match the actual build/configuration and SDK provenance commit. This alpha is not an approved production service.
 
-The publisher uses four recipe slots across three providers: Hyperliquid BTC volume, ANU, TickerLayer BTCUSD lastTrade and TickerLayer ETHUSD lastTrade. The latter two share their Airnode signer. It fetches the deterministic API3 source/query, authenticates and persists the record, then commits before the next 200-block epoch starts. Game requests pin epoch ID/hash and need only the fixed-key VRF proof without further API fetches. Missing commitment rejects requests without retaining fees; a late commit cannot repair a started epoch.
+The publisher uses four recipe slots across three providers: Hyperliquid BTC volume, ANU, TickerLayer BTCUSD lastTrade and TickerLayer ETHUSD lastTrade. The latter two share their Airnode signer. It fetches the deterministic API3 source/query, authenticates and persists the record, then commits before the next 200-block epoch starts. Randomness requests pin epoch ID/hash and need only the fixed-key VRF proof without further API fetches. Missing commitment rejects requests without retaining fees; a late commit cannot repair a started epoch.
 
 Publisher and fulfillment share one wallet nonce lane. Publication is automatic; the registry committer must equal the transaction wallet. Off local chains require ARC_EXPECTED_PROTOCOL_HASH and ARC_EXPECTED_CODE_HASH. Follow actual configuration names and preserve lane ownership. The process is outbound-only. The public verification site stays keyless and separate. Outbound health reporting creates no incoming API.
 

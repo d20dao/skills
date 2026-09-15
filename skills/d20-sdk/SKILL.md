@@ -3,11 +3,11 @@ name: d20-sdk
 description: Build and consume the local D20 SDK for epoch commitments, VRF replay, mapping, ABI and Solidity imports.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `67d6b0113c92d860b3771ba9e496fa716d17d9ec`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
 
 Read the SDK README, AGENTS.md, package.json and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed configuration. The provisional @arcdao/vrf-sdk 0.1.0-alpha.0 is private and release-blocked. Do not invent registry availability, deployment addresses or service readiness.
 
-The current protocol commits signed API3 data before each 200-block epoch, then fixes the epoch ID/hash in every request's VRF input. Per-game fulfillment submits only the real proof. Missing current commitment rejects requests without retaining their fee.
+The current protocol commits signed API3 data before each 200-block epoch, then fixes the epoch ID/hash in every request's VRF input. Per-request fulfillment submits only the real proof. Missing current commitment rejects requests without retaining their fee.
 
 Use Node >=22.13 and repository npm ci/test. The smoke builds, packs and installs an actual tarball; use its reported filename for local consumer installation. For library-specific setup use current official docs or Context7.
 
