@@ -19,3 +19,7 @@ Both service contracts use initialized UUPS proxies with two-step ownership. Upg
 Match the installed SDK provenance and deployed implementation history before use. Packaging remains private and guarded. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
 These guides follow public protocol commit `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
+
+## Arc Testnet pilot
+
+A restricted pilot is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Consumer allowlisting is required. The [small-sample measurements](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-pilot-2026-09-15.json) cover proof acceptance, same-result callback repair and expired-request refunds; they are not an SLA. SDK npm publication remains separate from this GitHub testnet release.
