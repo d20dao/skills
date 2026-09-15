@@ -3,7 +3,7 @@ name: d20-verification
 description: Verify d20dao epoch API3 evidence, fixed-key VRF results and mappings using trusted request, publication and proxy history.
 ---
 
-Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
 Use the public @d20dao/vrf-sdk. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
 
@@ -18,3 +18,5 @@ Proof evidence is abi(Proof), 416 bytes; fulfillment calldata is 452 bytes. Epoc
 D20Proxy is atomically initialized; implementations are locked. Owner-authorized UUPS upgrades are a trust assumption and require storage/behavior review. Compatible upgrades must retain old accepted replay and pending requests. Reuse original initialized configuration and evidence, not current payout settings or today's epoch packet.
 
 CI fixture signatures and actual API3 signatures must be labeled honestly. Mapping alone does not verify origin, and callback failure does not invalidate accepted proof. Source admission, external review, upgrades and operational readiness remain separate from successful computation.
+
+Block-end proxy storage alone cannot identify the code that executed a transaction. The public checker leaves implementation trust unknown if either boundary changes or any upgrade event occurs in the relevant block, including an A-to-B-to-A rollback. Exact attribution then requires transaction-ordered execution evidence. Match canonical finalized receipts as well as mathematical proof results.

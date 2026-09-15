@@ -3,7 +3,7 @@ name: d20-lifecycle
 description: Diagnose d20dao on-demand publication, VRF deadlines, callback retries and fixed-recipient refunds from chain evidence.
 ---
 
-Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
 Read current D20VRFCoordinator/EpochEntropy sources, actual proxy ABIs, implementation history and SDK provenance. Logs and health are observations; trusted receipts and state establish outcomes.
 
@@ -23,3 +23,7 @@ Acceptance exactly at requestedAt+60 seconds is timely; refunds require strictly
 Full coordinator ABI contains recovery functions omitted from ID20VRF. Separate request fees, application refunds, callback delivery and keeper credits. After compaction, use retained IDs/hashes to retrieve original public events; raw local bodies may be gone. Unused local snapshots can be retained for 50 epochs with live-work protection.
 
 An implementation change stops the keeper until explicit review and updated pins. Preserve journal/proof/nonce data; do not treat an upgrade as permission to reroll or bypass recovery. Prepare concrete authorized recovery calls; a read-only diagnosis does not authorize gas or administration.
+
+## Optional refund notification
+
+In the source revision above, `refundRequest` settles the fixed recipient payment or backed credit before notifying the original consumer with `onRefund(requestId)`. Notification failure does not undo settlement. `retryRefundCallback(requestId, gasLimit)` retries only the notice, never a second payment or randomness. Check `refundCallbackDelivered` and `RefundCallbackAttempted` separately from refund credit. Confirm the deployed implementation supports this hook; the current pilot manifest may still reference the earlier implementation.

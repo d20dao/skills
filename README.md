@@ -18,7 +18,7 @@ Both service contracts use initialized UUPS proxies with two-step ownership. Upg
 
 Match the installed SDK provenance and deployed implementation history before use. Packaging remains private and guarded. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
-These guides follow public protocol commit `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
+These guides follow public protocol commit `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
 
 ## Arc Testnet pilot
 

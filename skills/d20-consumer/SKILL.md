@@ -3,7 +3,7 @@ name: d20-consumer
 description: Integrate d20dao randomness consumers, authenticated callbacks and deterministic mappings into an application.
 ---
 
-Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
 Read the installed @d20dao/vrf-sdk README, AGENTS.md, declarations and provenance. Confirm canonical source, chain, effective coordinator/registry proxy addresses and both implementation histories. D20VRF is the current identifier; DiceConsumer.sol is one example. No public service or package release is implied.
 
@@ -18,3 +18,5 @@ After epoch activation, requests escrow exact fees even if publication is pendin
 Both contracts support owner-authorized UUPS upgrades and two-step ownership. Upgrade authority is trusted. The registry committer, coordinator payout recipient and keeper share are administrable; the current implementation provides no request-input or VRF-key override. Verify deployed code, implementation pins and service onboarding rather than trusting code length or an address alone.
 
 Use the application's existing validation/payment/result flow. SDK examples do not implement application refunds, PoW, claim locking or minting. Compile through the actual resolver and test changed authentication, fee and lifecycle paths. Local success does not establish service readiness.
+
+Consumers using the refund-enabled implementation can override `_onRefund(uint256 requestId)` in `D20VRFConsumer`. The base authenticates the coordinator. Keep the initial hook within 100,000 gas and update only bounded application state. The notification means paid or credited to the fixed refund recipient, not necessarily paid to this consumer. Reentry into coordinator request/refund/retry paths is rejected. Schedule any new, separately paid request in a later transaction under the application's own rules. Verify live implementation capability before depending on the hook.

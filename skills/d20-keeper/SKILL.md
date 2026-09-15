@@ -3,7 +3,7 @@ name: d20-keeper
 description: Configure, observe and recover d20dao-keeper with on-demand snapshots, UUPS implementation pins and one durable nonce lane.
 ---
 
-Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
 Read canonical AGENTS.md, keeper/README.md, keeper/MIGRATION.md, keeper/TELEGRAM.md and deploy/docker/README.md as relevant. Match reviewed source and deployment configuration. Successful setup is not production approval.
 
@@ -31,3 +31,5 @@ Read-only local health is `d20dao-keeper health --db <absolute-path> --max-age 3
 Telegram is disabled by default. Both TELEGRAM_BOT_TOKEN and numeric TELEGRAM_CHAT_ID must be privately configured to opt in; do not read or expose actual credentials during documentation/test work. Only that chat can use read-only /status and /keeper. These return public observations and never modify settings, fund wallets or send transactions. Notifications are best-effort; group members in the configured chat can request summaries. No webhook or public application port is needed.
 
 For code changes use canonical Rust/check/integration workflows. Optional NEON_DB enables an outbound public-evidence index; its availability must not block fulfillment. Local tests must explicitly remove NEON_DB and Telegram settings from child environments. Keep actual key/config files and bot calls outside ordinary source or documentation work.
+
+Durable discovery and terminal classification read finalized state. Receipt reconciliation validates finalized height, transaction identity and canonical block hash before resolving the nonce; restart checks a persisted finalized checkpoint. Reversed finalized history stops processing for investigation, not an automatic nonce reset. Arc Testnet is the approved profile; review finality latency before another chain. Preparation uses persisted fair scheduling; large Explorer epoch refreshes stage 128-row pages and publish atomically.
