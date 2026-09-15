@@ -1,24 +1,25 @@
 ---
 name: d20-lifecycle
-description: Diagnose D20 epoch admission, VRF acceptance deadlines, callback retries and fixed-recipient refunds from chain state.
+description: Diagnose d20dao on-demand publication, VRF deadlines, callback retries and fixed-recipient refunds from chain evidence.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
 
-Read target AGENTS.md, ArcVRFCoordinator.sol, EpochEntropy.sol and actual ABI. Match the SDK provenance commit and deployed configuration. The alpha is not an approved production service. Logs/UI labels are observations; trusted receipts and chain state establish status.
+Read current D20VRFCoordinator/EpochEntropy sources, actual proxy ABIs, implementation history and SDK provenance. Logs and health are observations; trusted receipts and state establish outcomes.
 
-Each 200-block epoch must commit signed API3 data before starting. No current commitment means new requests revert without retaining their fee; that is admission failure rather than an accepted request timeout. Late commitments cannot repair started epochs. Accepted requests retain their epoch ID/hash across subsequent boundaries.
+Idle local preparation produces no publication transaction. An unpublished idle epoch is normal. Before initial activation requests revert; afterwards a paid request may escrow its fee while waiting for the saved epoch packet. Publication resolves targetBlock=max(requestBlock,commitBlock+1); there is no usable seed before the future block hash. An older epoch can still publish for timely pending demand across a boundary.
 
 | State | Meaning and recovery |
 | --- | --- |
-| Pending through deadline | Valid proof may still be accepted. Pending transaction is not acceptance. No cancellation or automatic reroll. |
-| Fulfilled, callback delivered | Result is final; continue separate application claim. |
-| Fulfilled, callback failed | Fee is earned. retryCallback redelivers only the same result. |
-| Unfulfilled strictly after deadline | refundRequest pays the fixed recipient, not caller, unless already refunded. |
-| Refund transfer failed | Inspect refundCredits and actual withdrawal ABI. Credit is not a reroll opportunity. |
+| Unpublished request, deadline live | Fee is escrowed. Inspect saved snapshot, demand, target resolution and keeper nonce; no alternate query or reroll. |
+| Published request, deadline live | Real proof can be accepted after target confirmations; pending transactions are not acceptance. |
+| Fulfilled, callback delivered | Result is final; continue the separate application action. |
+| Fulfilled, callback failed | Service is earned. Retry only the same accepted result. |
+| Unfulfilled strictly after deadline | refundRequest pays the fixed recipient or refund credit, not caller. |
+| Failed keeper payment | Keeper credit is separate from requester escrow and refund credit. |
 
-The deadline is requestedAt +60 seconds. Inclusion exactly at the deadline is timely; refund requires strictly later. Use actual inclusion timestamp and finality/reorg policy, not browser time or submission time. Keep key/input/mapping/epoch fixed.
+Acceptance exactly at requestedAt+60 seconds is timely; refunds require strictly later. Preserve the original deadline, request block, epoch and target. Use actual inclusion timestamps and chain finality, not browser or submission time. A 30-second interruption can leave some requests timely and older ones expired; inspect each request, never assume a blanket outcome.
 
-Recovery functions are in the full coordinator ABI, not the smaller IArcVRF interface. Separate RNG fees, delivery and application-payment accounting. Diagnose ambiguous transaction outcomes before retrying. Prepare a concrete target, recipient and effect for authorized recovery; read-only diagnosis does not authorize gas spending.
+Full coordinator ABI contains recovery functions omitted from ID20VRF. Separate request fees, application refunds, callback delivery and keeper credits. After compaction, use retained IDs/hashes to retrieve original public events; raw local bodies may be gone. Unused local snapshots can be retained for 50 epochs with live-work protection.
 
-Do not treat a healthy keeper flag as proof of active epoch availability: the healthy-with-missing-epoch readiness gap remains open. Read registry admission state directly. After resolved-history compaction, retained IDs/hashes help locate chain evidence, but the keeper may no longer retain the raw replay packet.
+An implementation change stops the keeper until explicit review and updated pins. Preserve journal/proof/nonce data; do not treat an upgrade as permission to reroll or bypass recovery. Prepare concrete authorized recovery calls; a read-only diagnosis does not authorize gas or administration.

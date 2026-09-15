@@ -1,11 +1,15 @@
-# Maintaining D20 skills
+# d20dao integration guide for agents
 
-- Keep changes scoped to agent instructions; protocol code belongs in d20dao/keeper and SDK packaging in d20dao/d20-sdk.
-- Verify behavior against source and tests, not marketing descriptions. ArcDao and ArcVRF remain actual code identifiers; do not rename imports to D20 without a corresponding package release.
-- Each `skills/<name>/SKILL.md` needs YAML `name` and `description`, with a matching lowercase hyphenated folder name. Keep every installed folder self-contained.
-- Before changing version-sensitive guidance, read the source repository's AGENTS.md and compare the target revision, ABI, SDK provenance and deployment configuration. Record reviewed revisions in the compatibility notes; uncommitted source is not a release.
-- Never infer production readiness, service availability, npm publication or source activation from catalog membership or successful local tests.
-- Preserve exact-fee requests, fixed refund recipients, 60-second onchain proof acceptance, immutable mapping/key/input, authenticated callbacks and same-result retries. No reroll or source fallback.
-- Keep keeper keys and test prover code out of consumer/browser examples. Never include actual credentials, journals or user assets.
-- Validate frontmatter and linked references. For executable examples, use the canonical build/test workflow and record what ran. Do not imply text validation proves protocol security.
-- Ordinary documentation work does not authorize deployment, paid API calls, real transactions or package release.
+These skills support readers and assistants using the general d20dao randomness service. They do not grant access to an operator, a wallet, a bot or a deployed contract. Choose the relevant self-contained skill and inspect the installed @d20dao/vrf-sdk declarations and public provenance.
+
+- Use d20-consumer for D20VRFConsumer/ID20VRF integration, exact fees, callback authentication and deterministic mappings.
+- Use d20-lifecycle for pending publication, target readiness, timely acceptance, same-result callback retry and fixed-recipient refunds.
+- Use d20-verification for trusted proxy/epoch/request evidence and public replay. RequestContext includes original requestBlock and resolved targetBlock; replay configuration uses initialFeeRecipient.
+- Use d20-sdk for public exports, ABI/initializer shapes, Solidity imports and local package usage.
+- Use d20-keeper for authorized operator setup, observation and recovery, including implementation pins and one durable nonce lane.
+
+Epochs last 200 blocks. The keeper prepares snapshots locally without idle publication. Live paid demand publishes the first saved packet and binds randomness to max(requestBlock,commitBlock+1). Keep the original 60-second deadline, mapping, epoch and refund recipient; do not reroll to recover failed delivery. Unused local snapshots can remain for 50 epochs with live-work protection.
+
+Both service endpoints are initialized UUPS proxies with two-step owners. Stable addresses do not identify implementation code: verify both implementation histories and initialized configuration. Upgrade authority is trusted. The registry committer and coordinator payout/share are administrable without an operational request-input setter.
+
+Configure CHAIN_ID explicitly; Arc is one network, not an assumed default or service name. Telegram is opt-in and configured-chat-only with read-only /status and /keeper; no access is available by default. Public evidence and receipts are authoritative, while health and notifications are observations. Consumer integration does not authorize upgrades, key access, funding, bot messages or publishing.

@@ -1,20 +1,20 @@
 ---
 name: d20-verification
-description: Verify D20 API3 epoch commitments, fixed-key VRF evidence and mappings against independently trusted chain context.
+description: Verify d20dao epoch API3 evidence, fixed-key VRF results and mappings using trusted request, publication and proxy history.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
 
-Read target AGENTS.md, SDK declarations/provenance and current replay, epoch, evidence, verification and mapping source. Match the reviewed commit and deployed configuration. Use public helpers only; keep signer keys outside the verifier. The private alpha is not an approved production service.
+Use the public @d20dao/vrf-sdk. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
 
-Each 200-block epoch commits signed API3 data before starting. Requests pin epoch ID/hash in fixed-key VRF input; fulfillment submits only the real proof. Missing commitment rejects new requests without retaining fees.
+1. Pin chain, effective D20VRFCoordinator/EpochEntropy addresses, implementation histories, initialized public key and configuration independently of submitted proof. Retrieve successful receipts/state and validate log emitters.
+2. Source anchor is epochStart-1. Decode original EpochCommitted evidence and replayEpochCommitment using its exact packet, ordered four signers, anchor, record and actual publication block/time. Publication is on demand and may occur after the first request or an epoch boundary.
+3. Slots are Hyperliquid BTC volume, ANU, TickerLayer BTCUSD and TickerLayer ETHUSD; the latter share a signer. Preserve exact signed bytes up to 128 bytes. Attestation establishes wrapper provenance, not unbiased upstream data.
+4. Decode FulfillmentEvidence with decodeEvidencePacket and call replayCoordinator using trusted RequestContext. Bind BOTH requestBlock and targetBlock; derive the epoch from requestBlock and require targetBlock=max(requestBlock,committedBlock+1). Use its actual canonical hash and timely inclusion block/time. Never trust an expected key/seed supplied by the proof.
+5. configuration.feeRecipient must come from initialFeeRecipient, not mutable current feeRecipient. Compare transcript and commitments with both event and storage. Replayed computations do not authenticate RPC or prove receipt inclusion; apply finality/reorg policy.
 
-1. Pin chain, coordinator/registry code, immutable key and configuration independently of evidence. Retrieve successful receipts/state and check actual log emitters.
-2. Decode the original EpochCommitted packet with decodeEpochEvidencePacket and verify with replayEpochCommitment. Supply trusted catalog/signers, epoch ID, anchor hash, stored record and actual commit block/time. Verify exact query, signature, deterministic selection and pre-start commitment.
-3. The four ordered recipe slots are 0 Hyperliquid BTC volume, 1 ANU, 2 TickerLayer BTCUSD lastTrade and 3 TickerLayer ETHUSD lastTrade. The TickerLayer recipes use assetClass crypto and the same Airnode signer 0x32f5eA20F05fdADfCD50Cb8eD920acE96D5f9f2c. Read four signer addresses in their fixed order; three providers do not mean a three-slot catalog. Preserve the entire signed raw response, limited to 128 bytes, and selected query. Read original public epoch event evidence even when resolved keeper history has compacted its raw local payload. Attestation proves wrapper provenance, not unbiased upstream data.
-4. Decode FulfillmentEvidence.packet with decodeEvidencePacket and use replayCoordinator with its actual exported input fields. Expected key, request block/hash, epoch ID/hash, mapping, configuration and inclusion time/block come from trusted context, not the proof. Compare event AND stored commitments.
-5. Explain result and trust boundary: local replay checks computations, not RPC authenticity or inclusion. Apply chain finality/reorg policy.
+Proof evidence is abi(Proof), 416 bytes; fulfillment calldata is 452 bytes. Epoch evidence is abi(string canonicalRequest,Attestation). Neither has a version prefix; trusted emitter/event determines the decoder. Wrapper submissions remain verifiable through logs.
 
-Proof packet encoding is abi(Proof), exactly 416 bytes. Epoch packet encoding is abi(string canonicalRequest, Attestation). Neither has a version prefix; trusted emitter/event determines the decoder. Logs support wrapper submissions whose outer calldata differs.
+D20Proxy is atomically initialized; implementations are locked. Owner-authorized UUPS upgrades are a trust assumption and require storage/behavior review. Compatible upgrades must retain old accepted replay and pending requests. Reuse original initialized configuration and evidence, not current payout settings or today's epoch packet.
 
-Accepted requests retain their epoch across boundaries. Timely onchain acceptance is at or before requestedAt +60 seconds, independent of callback success. Mapping is not proof verification. A real VRF proof is required. Source admission, external crypto review and deployment validation remain release gates.
+CI fixture signatures and actual API3 signatures must be labeled honestly. Mapping alone does not verify origin, and callback failure does not invalidate accepted proof. Source admission, external review, upgrades and operational readiness remain separate from successful computation.

@@ -1,22 +1,20 @@
 ---
 name: d20-sdk
-description: Build and consume the local D20 SDK for epoch commitments, VRF replay, mapping, ABI and Solidity imports.
+description: Build and consume the d20dao randomness SDK for on-demand epoch evidence, VRF replay, mapping, ABI and Solidity imports.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
 
-Read the SDK README, AGENTS.md, package.json and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed configuration. The provisional @arcdao/vrf-sdk 0.1.0-alpha.0 is private and release-blocked. Do not invent registry availability, deployment addresses or service readiness.
+Read README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Current @d20dao/vrf-sdk is private and guarded; no registry publication or service availability is implied.
 
-The current protocol commits signed API3 data before each 200-block epoch, then fixes the epoch ID/hash in every request's VRF input. Per-request fulfillment submits only the real proof. Missing current commitment rejects requests without retaining their fee.
+The keeper prepares local snapshots for 200-block epochs. Idle work causes no publication transaction; unused snapshots can remain for 50 epochs. Live allowlisted demand escrows the exact fee, triggers saved-packet publication and resolves targetBlock=max(requestBlock,commitBlock+1). The original 60-second deadline remains fixed.
 
-Use Node >=22.13 and repository npm ci/test. The smoke builds, packs and installs an actual tarball; use its reported filename for local consumer installation. For library-specific setup use current official docs or Context7.
+Use Node >=22.13 and repository npm ci/test. Install the local tarball reported by npm pack. For library-specific syntax use current official docs or Context7. Publishing credentials are unnecessary for public dependency installation and must not be read or used by ordinary package checks.
 
-Public root exports include mapping, encodeEvidencePacket/decodeEvidencePacket, replayCoordinator and epoch helpers. The /epoch subpath exposes epoch operations. The /abi subpath exports coordinatorAbi and epochEntropyAbi, also available as ArcVRFCoordinator.json and EpochEntropy.json. Read installed declarations for exact inputs. EpochSigners is a readonly four-address tuple, matching the registry address[4] constructor: Hyperliquid, ANU, TickerLayer BTCUSD and TickerLayer ETHUSD in that order. The last two slots use the same provider signer.
+Root exports include mapping, encodeEvidencePacket/decodeEvidencePacket, replayCoordinator and epoch helpers. /epoch exposes epoch operations. /abi exports coordinatorAbi and epochEntropyAbi; JSON names are D20VRFCoordinator.json and EpochEntropy.json. Registry initialize takes address[4]; implementation constructors are empty and locked. EpochSigners is a readonly four-address tuple for Hyperliquid, ANU and the two TickerLayer recipe slots.
 
-Proof evidence is 416 bytes. Epoch evidence encodes canonical query and attestation. Neither has a version prefix; trusted emitter/event determines the decoder. Complete replay requires original epoch evidence and independently trusted registry/request context. Mapping alone does not verify origin.
+RequestContext binds requestBlock and targetBlock. Replay configuration.feeRecipient is the initialized initialFeeRecipient, not the mutable payout address. Use effective proxy addresses and independently trusted implementation history. Proof evidence remains 416 bytes and fulfillment calldata 452 bytes; epoch evidence carries the full signed packet. Decoding/mapping are not proof verification.
 
-Solidity imports use @arcdao/vrf-sdk/contracts/ with compiler 0.8.28. Start from DiceConsumer.sol, pin configuration and obtain keeper allowlist onboarding before live use.
+Consumer imports use @d20dao/vrf-sdk/contracts/D20VRFConsumer.sol, interfaces/ID20VRF.sol and libraries/D20VRFRequests.sol with compiler 0.8.28. DiceConsumer.sol is one example, not the product scope. Obtain service onboarding before live requests.
 
-Build from the reviewed protocol snapshot. Update source and provenance together; do not hand-edit generated dist/ABI or fork cryptography. Preserve notices/licenses and exclude all fixtures, proof generation, keeper code and secrets from the tarball.
-
-The real-tarball smoke checks JS, strict TypeScript, ABI parity, public fixture replay, a browser-target bundle executed under Node and Solidity compilation. It requires registry access. Passing does not establish live browser behavior, crypto safety, real source admission or service readiness. The known healthy-with-missing-epoch gap remains open, so health output does not establish current request admission. Preserve private/publish guards absent concrete release authorization.
+Build from exact reviewed protocol Git blobs, preserving vendor/licenses and hashes. The UUPS ABI build uses OpenZeppelin contracts and contracts-upgradeable 5.6.1. Do not hand-edit generated output or add operators, keys, fixtures or provers to the tarball. Distinguish explicit CI fixtures from actual API3 signatures; a Node-executed browser-target bundle is not a live browser test. Successful packaging does not approve release, upgrades or deployment.

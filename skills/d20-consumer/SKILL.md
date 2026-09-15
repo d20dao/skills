@@ -1,20 +1,20 @@
 ---
 name: d20-consumer
-description: Integrate D20 ArcVRF Solidity consumers, authenticated callbacks and deterministic mappings into an existing application.
+description: Integrate d20dao randomness consumers, authenticated callbacks and deterministic mappings into an application.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
 
-Read the target SDK AGENTS.md, README, declarations, provenance and DiceConsumer.sol. Match the reviewed canonical commit and deployed configuration. The current alpha is private and release-blocked; preserve ArcVRF identifiers and do not invent production availability.
+Read the installed @d20dao/vrf-sdk README, AGENTS.md, declarations and provenance. Confirm canonical source, chain, effective coordinator/registry proxy addresses and both implementation histories. D20VRF is the current identifier; DiceConsumer.sol is one example. No public service or package release is implied.
 
-The coordinator fixes a precommitted API3 epoch ID/hash in every request's VRF input. Each epoch lasts 200 blocks and must be committed before starting. Missing commitment rejects new requests without retaining the fee. Per-request fulfillment contains only the real fixed-key VRF proof.
+After epoch activation, requests escrow exact fees even if publication is pending. The keeper publishes its first validated local snapshot for live allowlisted demand, then targetBlock=max(requestBlock,commitBlock+1). Keep original request block, epoch, mapping, recipient and 60-second deadline fixed. Multiple requests may share a snapshot; never create a replacement request to recover an accepted result.
 
-- Pin chain, coordinator code/configuration, epoch registry and immutable public key. A code-length check alone is not trust. Obtain keeper allowlist onboarding before live requests. Pin the four ordered recipe signer slots across Hyperliquid, ANU and the shared TickerLayer BTCUSD/ETHUSD signer.
-- Use packaged ArcVRFConsumer, IArcVRF, ArcVRFRequests and RandomnessMapping with compiler 0.8.28. Use coordinatorAbi and epochEntropyAbi for chain reads; do not duplicate ABI or mapping arithmetic.
-- For a dice integration, the request helper supports rng.d20(ArcVRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)). Require exact requestFee when collecting only RNG fees; helpers send the quote from consumer balance. Account separately for application payments without subsidizing underpayment or retaining overpayment.
-- Fix recipient, caller/request association and mapping. Preserve application state so a user cannot discard an accepted outcome and reroll the same operation.
-- Override _fulfillRandomness(uint256 requestId, bytes32 randomness). ArcVRFConsumer authenticates the external callback; validate the expected request and store raw bytes32 with minimal work. Keep application actions and transfers separate.
-- Built-in mappings still callback with raw bytes32. Read getMappedResult or use canonical mapping. A d20 result is 1 through 20.
-- Timely service requires onchain proof acceptance at or before requestedAt +60 seconds. Callback failure still earns the fee; retry only the same result. Expired unfulfilled requests refund only the fixed recipient or its refund credit.
+- Use packaged D20VRFConsumer, ID20VRF, D20VRFRequests and RandomnessMapping with compiler 0.8.28. coordinatorAbi/epochEntropyAbi describe the effective proxy endpoints.
+- For a dice example, rng.d20(D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)) forwards the quoted requestFee. Require exact payment and account separately for application payments.
+- Fix caller/request association and application state so users cannot discard accepted outcomes. D20VRFConsumer authenticates the coordinator proxy; validate expected requests and store raw bytes32 with minimal work. Keep application actions/transfers separate.
+- Mapped callbacks still return raw words. Read getMappedResult or use canonical mapping; d20 maps to 1 through 20.
+- Valid onchain acceptance at or before original requestedAt+60 seconds is timely. Callback failure still earns service payment; retryCallback redelivers only the same result. Expired unfulfilled requests refund their fixed recipient or refund credit.
 
-Use the application's existing validation, payment and result-consumption flow. RNG refunds do not implement application-payment refunds. The dice/mining examples do not supply PoW validation, claim locking or minting. Compile with the actual consumer resolver and exercise changed authentication, fee and lifecycle paths. Successful local tests do not establish deployment or service readiness.
+Both contracts support owner-authorized UUPS upgrades and two-step ownership. Upgrade authority is trusted. The registry committer, coordinator payout recipient and keeper share are administrable; the current implementation provides no request-input or VRF-key override. Verify deployed code, implementation pins and service onboarding rather than trusting code length or an address alone.
+
+Use the application's existing validation/payment/result flow. SDK examples do not implement application refunds, PoW, claim locking or minting. Compile through the actual resolver and test changed authentication, fee and lifecycle paths. Local success does not establish service readiness.

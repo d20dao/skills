@@ -1,21 +1,21 @@
-# D20 agent skills
+# d20dao agent skills
 
-Self-contained instructions for the general randomness service using epoch API3 plus fixed-key VRF. Actual identifiers remain ArcDao/ArcVRF. These describe source behavior, not a production service.
+Self-contained instructions for the general randomness service, public @d20dao/vrf-sdk, and outbound d20dao-keeper. Current contracts use D20VRF names. Arc refers to the network, not the service brand.
 
 | Skill | Use |
 | --- | --- |
-| d20-consumer | Integrate consumers and mappings |
-| d20-lifecycle | Diagnose admission, acceptance, callbacks and refunds |
-| d20-verification | Replay epoch/VRF evidence with trusted context |
-| d20-sdk | Build and consume the local private SDK |
-| d20-keeper | Configure and recover keeper and publisher |
+| d20-consumer | Integrate authenticated consumers and deterministic mappings |
+| d20-lifecycle | Diagnose publication, acceptance, callbacks and refunds |
+| d20-verification | Replay public epoch/VRF evidence with trusted context |
+| d20-sdk | Build and use the private alpha SDK |
+| d20-keeper | Configure, observe and recover the operator |
 
-Copy required folders into the agent skill directory. Each is self-contained and supports invocation by name or automatic discovery.
+Copy the required folder into the agent skill directory. Each supports explicit invocation and normal automatic discovery. Canonical sources are [keeper](https://github.com/d20dao/keeper) and [SDK](https://github.com/d20dao/d20-sdk).
 
-Canonical sources are [keeper](https://github.com/d20dao/keeper) and [SDK](https://github.com/d20dao/d20-sdk). Match the target PROTOCOL-PROVENANCE.json reviewed commit and deployment configuration. Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; its protocol snapshot is pinned to this canonical commit. No release is implied.
+The keeper prepares 200-block epoch snapshots locally. Idle snapshots cause no publication transaction and can remain for 50 epochs. Live paid demand triggers publication, then randomness binds a canonical future block. Requests retain their original 60-second deadline and fixed recipient.
 
-Four recipe slots cover three providers: Hyperliquid BTC volume, ANU, and TickerLayer BTCUSD/ETHUSD lastTrade with one shared TickerLayer signer. Each 200-block epoch commits the complete signed API3 response before starting. Requests pin epoch ID/hash in fixed-key VRF input and submit only the real proof. Missing commitment rejects requests without retaining fees. Installing instructions does not authorize deployment, spending, publishing or service launch.
+Both service contracts use initialized UUPS proxies with two-step ownership. Upgrade authority is trusted; verify both implementation histories and runtime pins. Telegram is opt-in and configured-chat-only, with read-only status/keeper commands. Docker install requires reviewed configuration and separately supplied keys.
 
-Maintainers: read AGENTS.md, update from reviewed source and validate all five skills with skill-creator quick_validate.py. Keep secrets, user assets and copied cryptographic implementations out of skills.
+Match the installed SDK provenance and deployed implementation history before use. Packaging remains private and guarded. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
-Live API3/local-chain replay fixtures cover all four recipe slots in SDK validation. The four-recipe update is pinned to canonical keeper commit `dcca615b3e07f273e45fa5596f80b63da241896a`; the SDK packaging commit is `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`. A known healthy-with-missing-epoch gap remains open; these guides do not establish a public service guarantee.
+These guides follow public protocol commit `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.

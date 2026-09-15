@@ -1,28 +1,33 @@
 ---
 name: d20-keeper
-description: Configure and recover the outbound D20 keeper and epoch publisher while preserving commitments, persisted proofs, nonce ownership and expiry.
+description: Configure, observe and recover d20dao-keeper with on-demand snapshots, UUPS implementation pins and one durable nonce lane.
 ---
 
-Reviewed canonical keeper commit: `dcca615b3e07f273e45fa5596f80b63da241896a`. Reviewed SDK commit: `77b6b8bbbcb5d9b9e9fff1e33a42ac3fa205b321`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
+Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
 
-Read target AGENTS.md, keeper/README.md, .env.example and keeper/MIGRATION.md for migration; use deploy/docker/README.md for containers. Match the actual build/configuration and SDK provenance commit. This alpha is not an approved production service.
+Read canonical AGENTS.md, keeper/README.md, keeper/MIGRATION.md, keeper/TELEGRAM.md and deploy/docker/README.md as relevant. Match reviewed source and deployment configuration. Successful setup is not production approval.
 
-The publisher uses four recipe slots across three providers: Hyperliquid BTC volume, ANU, TickerLayer BTCUSD lastTrade and TickerLayer ETHUSD lastTrade. The latter two share their Airnode signer. It fetches the deterministic API3 source/query, authenticates and persists the record, then commits before the next 200-block epoch starts. Randomness requests pin epoch ID/hash and need only the fixed-key VRF proof without further API fetches. Missing commitment rejects requests without retaining fees; a late commit cannot repair a started epoch.
+Epochs last 200 blocks. The source anchor is start-1; four recipe slots cover Hyperliquid, ANU and TickerLayer BTCUSD/ETHUSD. Prepare the first validated snapshot locally and persist it unchanged. Idle preparation has no publication transaction. Unused snapshots can remain for 50 epochs/10,000 blocks, with live demand and unresolved nonce protection. A live allowlisted paid request triggers publication; its target becomes max(original requestBlock,commitBlock+1). Never extend its original 60-second deadline, change query or refresh persisted data for another outcome.
 
-Publisher and fulfillment share one wallet nonce lane. Publication is automatic; the registry committer must equal the transaction wallet. Off local chains require ARC_EXPECTED_PROTOCOL_HASH and ARC_EXPECTED_CODE_HASH. Follow actual configuration names and preserve lane ownership. The process is outbound-only. The public verification site stays keyless and separate. Outbound health reporting creates no incoming API.
+The daemon is outbound-only. Epoch publication and fulfillment share one wallet nonce lane; HTTP work cannot sign. Use a dedicated transaction wallet and separate VRF key. Registry committer authorization must match the transaction wallet. Core variable names are generic: RPC_URLS, CHAIN_ID, COORDINATOR_ADDRESS, KEEPER_DB, TX_KEY_FILE, VRF_KEY_FILE and SEND_TRANSACTIONS. CHAIN_ID is required explicitly; no Arc default is assumed. Keep sends disabled until authorized.
 
-Use separate VRF/transaction key files, a dedicated wallet, approved chain/code/protocol/registry pins and absolute persistent ARC_DB. The binary reads process environment. ARC_SEND_TRANSACTIONS defaults false. Keep credentials private and fixture keys restricted to isolated local tests. HTTP 402 requires separate payment authorization.
+Pin EXPECTED_CODE_HASH, EXPECTED_PROTOCOL_HASH, EXPECTED_IMPLEMENTATION_CODE_HASH and EXPECTED_REGISTRY_IMPLEMENTATION_CODE_HASH as required by the deployment. Both implementations and their slot addresses are checked; an unreviewed change stops processing before reconciliation/sends. Two-step owners administer committer/payout/share and UUPS upgrades. Preserve journal and prepared data during review; do not bypass pins by adopting a fresh database.
 
-Read-only health is arcdao-keeper health --db /absolute/journal.sqlite --max-age 30. Nonzero may mean degraded, absent, stale or future-dated health. Verify the actual active epoch commitment separately: a known readiness gap can report healthy while it is missing. Inspect chain/journal; local locks do not establish backup freshness or distributed exclusion.
+For Docker, run init and configure keeper.env from reviewed settings first. Then the install wrapper builds, imports separately supplied keys and starts the service in one command:
 
-- Reconcile receipts and signed attempts before another nonce. Timeout, missing response and already-known acknowledgment do not establish failure or acceptance.
-- Reuse the first persisted authenticated epoch response and commitment across retries/restarts, including when waiting for chain time to catch up. Transient HTTP retries are bounded same-query attempts, not response refresh after persistence. Keep request epoch/input and prepared proof/calldata fixed.
-- Journal before broadcast. Rebroadcast identical signed bytes; bounded replacements retain nonce, destination and calldata. Respect gas/fee/cost caps.
-- Enforce request deadlines and epoch pre-start cutoffs. A pending nonce may use bounded zero-value self-transaction cleanup; its gas cost does not fulfill or refund a request.
-- Unknown nonce conflicts stop the lane for investigation. Preserve journal, lock and signed-attempt history; maintain exclusive wallet ownership.
-- Restore consistent SQLite/WAL and scope metadata together, then reconcile freshness. Wallet/coordinator transitions use the canonical drained-only migration.
-- Accepted proof with failed callback is fulfilled service. Refund claims and callback recovery use separate authorized coordinator actions.
+- PowerShell: `./deploy/docker/keeper.ps1 install <transaction.key> <vrf.key>`
+- POSIX: `sh deploy/docker/keeper.sh install <transaction.key> <vrf.key>`
 
-Configuration changes require restart, which cannot fix insufficient budget, source unavailability or elapsed epoch windows. For Rust changes run canonical fmt/check, clippy with warnings denied, locked tests/build and keeper integration. Local tests do not establish real source admission, chain economics, refunds or crypto safety. Documentation/setup does not authorize a funded launch.
+The service uses d20dao-keeper, d20dao-state-v1/d20dao-keys-v1 volumes and /var/lib/d20dao state paths. Docker must already be available. Keep state, WAL and lock metadata together; stop and use the reviewed migration/backup workflow for identity changes. A setup request does not implicitly authorize funded operation.
 
-Resolved-history compaction removes raw job proof/calldata, signed transaction payloads and committed/expired epoch raw data only when associated work is resolved. It retains IDs, hashes, status and timing metadata, and preserves live nonce recovery data. Fetch public epoch/fulfillment events for later replay; expired unpublished epoch payloads have no chain archive. Compaction does not promise a smaller SQLite file or a complete raw local archive.
+Read-only local health is `d20dao-keeper health --db <absolute-path> --max-age 30`. Inspect freshness, current demand, local/published epoch state and actual receipts. Health alone is not a timely fulfillment guarantee. Bounded maintenance and constant-RPC-latency tests are local evidence, not a network SLA.
+
+- Reconcile all signed attempts before another nonce. Timeout or missing acknowledgment is not failure. Preserve exact raw bytes and proof/calldata through restart; replacements retain nonce/destination/payload.
+- Expired requests must not be proved or served. A bounded zero-value self-transaction may clear an unresolved nonce; it does not publish/refund/fulfill. Live previous-epoch demand can still settle without resampling.
+- Preserve the first valid packet while its clock catches up. Respect same-query retry/backoff without refreshing a saved packet.
+- Compaction removes eligible resolved payloads while retaining identities/hashes/status. Public events are the long-term replay source; unpublished expired local packets have no chain archive.
+- Keeper fee share goes to the configured committer; failed payment is keeper credit. Request refunds and callback retries are separate authorized operations.
+
+Telegram is disabled by default. Both TELEGRAM_BOT_TOKEN and numeric TELEGRAM_CHAT_ID must be privately configured to opt in; do not read or expose actual credentials during documentation/test work. Only that chat can use read-only /status and /keeper. These return public observations and never modify settings, fund wallets or send transactions. Notifications are best-effort; group members in the configured chat can request summaries. No webhook or public application port is needed.
+
+For code changes use canonical Rust/check/integration workflows. Optional NEON_DB enables an outbound public-evidence index; its availability must not block fulfillment. Local tests must explicitly remove NEON_DB and Telegram settings from child environments. Keep actual key/config files and bot calls outside ordinary source or documentation work.
