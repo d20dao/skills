@@ -3,7 +3,7 @@ name: d20-sdk
 description: Build and consume the d20dao randomness SDK for on-demand epoch evidence, VRF replay, mapping, ABI and Solidity imports.
 ---
 
-Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
 
 Read README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Current @d20dao/vrf-sdk is private and guarded; no registry publication or service availability is implied.
 

@@ -3,7 +3,7 @@ name: d20-consumer
 description: Integrate d20dao randomness consumers, authenticated callbacks and deterministic mappings into an application.
 ---
 
-Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
 
 Read the installed @d20dao/vrf-sdk README, AGENTS.md, declarations and provenance. Confirm canonical source, chain, effective coordinator/registry proxy addresses and both implementation histories. D20VRF is the current identifier; DiceConsumer.sol is one example. No public service or package release is implied.
 

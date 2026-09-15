@@ -3,7 +3,7 @@ name: d20-lifecycle
 description: Diagnose d20dao on-demand publication, VRF deadlines, callback retries and fixed-recipient refunds from chain evidence.
 ---
 
-Public protocol reference: `c10699c490c0dd6c7b5ccba7e704cb01fa8c86fa`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `8fe545a56aa8beea294a96b3ef3fd17a3f514b6b`. Match installed SDK provenance and deployed implementation history before use.
 
 Read current D20VRFCoordinator/EpochEntropy sources, actual proxy ABIs, implementation history and SDK provenance. Logs and health are observations; trusted receipts and state establish outcomes.
 
