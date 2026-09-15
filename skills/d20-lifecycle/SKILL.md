@@ -1,26 +1,22 @@
 ---
 name: d20-lifecycle
-description: Diagnose D20 ArcVRF request deadlines, accepted randomness, callback retries and fixed-recipient refunds from chain state.
+description: Diagnose D20 epoch admission, VRF acceptance deadlines, callback retries and fixed-recipient refunds from chain state.
 ---
 
-Use independently trusted chain data for the pinned chain and coordinator. Inspect the target coordinator ABI/source before choosing a recovery transaction. Worker logs and UI labels are observations; receipts and contract state establish service status.
+Reviewed canonical keeper commit: `db7101890b151f4539b3f6050d708bf7bfd381c7`. Reviewed SDK commit: `3a96f4c3c2878401fdf4c371bfe3e509b0992af4`; confirm its PROTOCOL-PROVENANCE.json matches this source pin.
 
-Current development baseline is keeper `7656c3eca6d4b5889254d337c650543e8793af90`. Verify newer versions rather than treating these instructions as a stable deployment specification. Read the target repository's AGENTS.md and `contracts/ArcVRFCoordinator.sol`.
+Read target AGENTS.md, ArcVRFCoordinator.sol, EpochEntropy.sol and actual ABI. Match the SDK provenance commit and deployed configuration. The alpha is not an approved production service. Logs/UI labels are observations; trusted receipts and chain state establish status.
 
-| State | Meaning and permitted recovery |
+Each 200-block epoch must commit signed API3 data before starting. No current commitment means new requests revert without retaining their fee; that is admission failure rather than an accepted request timeout. Late commitments cannot repair started epochs. Accepted requests retain their epoch ID/hash across subsequent boundaries.
+
+| State | Meaning and recovery |
 | --- | --- |
-| Pending, timestamp at or before deadline | A valid proof can still be accepted. No requester cancellation or automatic reroll. A pending transaction is not acceptance. |
-| Fulfilled, callback delivered | Accepted result is final for this request. Continue the application's separate claim action. |
-| Fulfilled, callback failed | The service fee is earned. `retryCallback(requestId, gasLimit)` can redeliver only the accepted result. Do not refund as unfulfilled. |
-| Unfulfilled, timestamp strictly after deadline | `refundRequest(requestId)` is available unless already refunded. It pays the fixed request recipient, not whoever calls it. |
-| Refund transfer failed | Inspect `refundCredits(recipient)` and the target ABI's withdrawal method. Credit is not a missing fulfillment or a reroll opportunity. |
+| Pending through deadline | Valid proof may still be accepted. Pending transaction is not acceptance. No cancellation or automatic reroll. |
+| Fulfilled, callback delivered | Result is final; continue separate application claim. |
+| Fulfilled, callback failed | Fee is earned. retryCallback redelivers only the same result. |
+| Unfulfilled strictly after deadline | refundRequest pays the fixed recipient, not caller, unless already refunded. |
+| Refund transfer failed | Inspect refundCredits and actual withdrawal ABI. Credit is not a reroll opportunity. |
 
-The deadline is request time plus 60 seconds. Acceptance at the deadline is timely; refunding requires time strictly after it. Use the inclusion block timestamp, not browser time, API arrival time or transaction submission time. Apply the application's chain finality/reorg policy before presenting a definitive outcome.
+The deadline is requestedAt +60 seconds. Inclusion exactly at the deadline is timely; refund requires strictly later. Use actual inclusion timestamp and finality/reorg policy, not browser time or submission time. Keep key/input/mapping/epoch fixed.
 
-For `EntropySnapshots` V2 also establish `requestedAt > committedAt` using trusted chain timestamps. Same-timestamp requests are ineligible even in a later block. Original committed API signatures may predate a V2 request; this is valid and does not relax legacy V1 freshness rules. V2 preserves the coordinator's deadline, fee, callback and refund rules.
-
-Inspect `retryCallback` and `refundRequest` through the full coordinator ABI: they are absent from the smaller current `IArcVRF` consumer interface. Verify their precise preconditions and withdrawal signature in the target revision rather than inventing calls.
-
-Separate RNG fees, callback delivery and game payments in status reporting. A coordinator refund is not proof that the application refunded mint/payment funds. Request source, query, mapping, key and input remain fixed throughout recovery. No alternate source or new randomness should repair an expired or failed-callback request.
-
-Prepare a concrete recovery call and explain its target, recipient and effect within the user's authorized scope. Inspect ambiguous transaction outcomes before any retry. Do not infer authorization to spend gas from a read-only diagnosis request.
+Recovery functions are in the full coordinator ABI, not the smaller IArcVRF interface. Separate RNG fees, delivery and game-payment accounting. Diagnose ambiguous transaction outcomes before retrying. Prepare a concrete target, recipient and effect for authorized recovery; read-only diagnosis does not authorize gas spending.
