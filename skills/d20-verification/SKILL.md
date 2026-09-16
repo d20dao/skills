@@ -1,21 +1,21 @@
 ---
 name: d20-verification
-description: Verify d20dao epoch API3 evidence, fixed-key VRF results and mappings using trusted request, publication and proxy history.
+description: Verify d20dao epoch API3 evidence, fixed-key VRF results and mappings using trusted request, publication, per-epoch signer catalog and proxy history.
 ---
 
-Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match installed SDK provenance and deployed implementation history before use.
 
 Use the public @d20dao/vrf-sdk. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
 
 1. Pin chain, effective D20VRFCoordinator/EpochEntropy addresses, implementation histories, initialized public key and configuration independently of submitted proof. Retrieve successful receipts/state and validate log emitters.
-2. Source anchor is epochStart-1. Decode original EpochCommitted evidence and replayEpochCommitment using its exact packet, ordered four signers, anchor, record and actual publication block/time. Publication is on demand and may occur after the first request or an epoch boundary.
+2. Source anchor is epochStart-1. Resolve the signer catalog in force for the request's epoch: the initial catalog (`catalogHash()` and the slot getters) unless a `CatalogScheduled(fromEpoch, catalogHash, signers)` event with fromEpoch at or below that epoch applies; `catalogHashAt(epoch)` and `signersAt(epoch)` return the same and `Epoch.catalogHash` records it. A scheduled catalog applies only to epochs at least two ahead of its scheduling and is a trust event. Decode original EpochCommitted evidence and replayEpochCommitment using its exact packet, those ordered four signers, anchor, record and actual publication block/time; the attestation timestamp must not be after publication or more than 240 seconds before it. Publication is on demand and may occur after the first request or an epoch boundary.
 3. Slots are Hyperliquid BTC volume, ANU, TickerLayer BTCUSD and TickerLayer ETHUSD; the latter share a signer. Preserve exact signed bytes up to 128 bytes. Attestation establishes wrapper provenance, not unbiased upstream data.
 4. Decode FulfillmentEvidence with decodeEvidencePacket and call replayCoordinator using trusted RequestContext. Bind BOTH requestBlock and targetBlock; derive the epoch from requestBlock and require targetBlock=max(requestBlock,committedBlock+1). Use its actual canonical hash and timely inclusion block/time. Never trust an expected key/seed supplied by the proof.
-5. configuration.feeRecipient must come from initialFeeRecipient, not mutable current feeRecipient. Compare transcript and commitments with both event and storage. Replayed computations do not authenticate RPC or prove receipt inclusion; apply finality/reorg policy.
+5. configuration.feeRecipient and configuration.initialMinFee must come from initialFeeRecipient and initialMinFee, the initialize arguments bound into protocolConfigurationHash, not the mutable feeRecipient or live pricing(); configuration.catalogHash stays the initial catalog even when the request's epoch used a scheduled one. Compare transcript and commitments with both event and storage. Replayed computations do not authenticate RPC or prove receipt inclusion; apply finality/reorg policy.
 
-Proof evidence is abi(Proof), 416 bytes; fulfillment calldata is 452 bytes. Epoch evidence is abi(string canonicalRequest,Attestation). Neither has a version prefix; trusted emitter/event determines the decoder. Wrapper submissions remain verifiable through logs.
+Proof evidence is abi(Proof), 416 bytes, taken from the FulfillmentEvidence log. Single fulfillRandomness calldata is 452 bytes; fulfillRandomnessBatch carries up to 16 proofs, emits the same per-request events and FulfillmentSkipped(requestId, reason) for untouched members, so index and verify from events, never from calldata shape. Epoch evidence is abi(string canonicalRequest,Attestation). Neither has a version prefix; trusted emitter/event determines the decoder. Wrapper submissions remain verifiable through logs.
 
-D20Proxy is atomically initialized; implementations are locked. Owner-authorized UUPS upgrades are a trust assumption and require storage/behavior review. Compatible upgrades must retain old accepted replay and pending requests. Reuse original initialized configuration and evidence, not current payout settings or today's epoch packet.
+D20Proxy is atomically initialized; implementations are locked. Owner-authorized UUPS upgrades are a trust assumption and require storage/behavior review; renounceOwnership is disabled, so upgrade authority moves only through an accepted two-step transfer. Compatible upgrades must retain old accepted replay and pending requests. Reuse original initialized configuration and evidence, not current payout settings, live pricing or today's epoch packet.
 
 CI fixture signatures and actual API3 signatures must be labeled honestly. Mapping alone does not verify origin, and callback failure does not invalidate accepted proof. Source admission, external review, upgrades and operational readiness remain separate from successful computation.
 
