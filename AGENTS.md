@@ -2,6 +2,8 @@
 
 These skills support readers and assistants using the general d20dao randomness service. They do not grant access to an operator, a wallet, a bot or a deployed contract. Choose the relevant self-contained skill and inspect the installed @d20dao/vrf-sdk declarations and public provenance.
 
+The main task is adding randomness to an existing application contract. Begin with [d20-consumer](skills/d20-consumer/SKILL.md), its [deployment reference](skills/d20-consumer/references/arc-testnet.md), [method table](skills/d20-consumer/references/methods.md) and [consumer example](skills/d20-consumer/assets/RandomnessConsumer.sol). Preserve existing authorization, storage, initialization and payment rules. The constructor-based example is not a drop-in initializer for upgradeable applications. Use keeper operations only when the user is actually operating a keeper.
+
 - Use d20-consumer for D20VRFConsumer/ID20VRF integration, exact fees, callback authentication and deterministic mappings.
 - Use d20-lifecycle for pending publication, target readiness, timely acceptance, same-result callback retry and fixed-recipient refunds.
 - Use d20-verification for trusted proxy/epoch/request evidence and public replay. RequestContext includes original requestBlock and resolved targetBlock; replay configuration uses initialFeeRecipient.

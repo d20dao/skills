@@ -5,7 +5,18 @@ description: Integrate d20dao randomness consumers, authenticated callbacks and 
 
 Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
-Read the installed @d20dao/vrf-sdk README, AGENTS.md, declarations and provenance. Confirm canonical source, chain, effective coordinator/registry proxy addresses and both implementation histories. D20VRF is the current identifier; DiceConsumer.sol is one example. No public service or package release is implied.
+Install `@d20dao/vrf-sdk` from npm and read its packaged README, AGENTS.md, declarations and provenance. The reviewed package is 0.1.1. Confirm the selected chain, effective coordinator/registry proxy addresses and both implementation histories. Use public documentation and the package when source repositories require separate access.
+
+## Integration workflow and resources
+
+Inspect the existing contract's authorization, storage/initializer design and request settlement first. Select raw randomness or the intended mapping; preserve application payment and eligibility rules. Do not introduce a keeper deployment into an application integration task.
+
+- For Arc Testnet, read [deployment addresses](references/arc-testnet.md) and [machine-readable identities](references/arc-testnet.json). Configure the coordinator proxy, not an implementation or the restricted pilot consumer.
+- Read [methods and semantics](references/methods.md) for built-in signatures, bounds, list commitments and recovery functions.
+- Adapt [RandomnessConsumer.sol](assets/RandomnessConsumer.sol) for a constructor-based consumer. It includes raw/mapped/shuffle requests, caller-scoped operation association and refund notifications. Add real eligibility rules; its public entry points do not decide who may obtain an application outcome.
+- Use [mappings.mjs](assets/mappings.mjs) for SDK mapping specs. A mapped word alone does not verify a proof.
+
+For an upgradeable existing application, preserve its initializer and storage layout. The SDK base uses a constructor/immutable coordinator; choose a reviewed adaptation or adapter instead of blindly copying inheritance. Compile in the user's actual toolchain and test exact fees, caller authorization, unknown/duplicate callbacks, same-word delivery repair and refund state. Summarize changed files, validation and any consumer onboarding still required.
 
 After epoch activation, requests escrow exact fees even if publication is pending. The keeper publishes its first validated local snapshot for live allowlisted demand, then targetBlock=max(requestBlock,commitBlock+1). Keep original request block, epoch, mapping, recipient and 60-second deadline fixed. Multiple requests may share a snapshot; never create a replacement request to recover an accepted result.
 
