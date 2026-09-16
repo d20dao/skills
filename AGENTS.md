@@ -5,7 +5,7 @@ These skills support readers and assistants using the general d20dao randomness 
 - Use d20-consumer for D20VRFConsumer/ID20VRF integration, exact fees, callback authentication and deterministic mappings.
 - Use d20-lifecycle for pending publication, target readiness, timely acceptance, same-result callback retry and fixed-recipient refunds.
 - Use d20-verification for trusted proxy/epoch/request evidence and public replay. RequestContext includes original requestBlock and resolved targetBlock; replay configuration uses initialFeeRecipient.
-- Use d20-sdk for public exports, ABI/initializer shapes, Solidity imports and local package usage.
+- Use d20-sdk for public exports, ABI/initializer shapes, Solidity imports and npm package usage.
 - Use d20-keeper for authorized operator setup, observation and recovery, including implementation pins and one durable nonce lane.
 
 Epochs last 200 blocks. The keeper prepares snapshots locally without idle publication. Live paid demand publishes the first saved packet and binds randomness to max(requestBlock,commitBlock+1). Keep the original 60-second deadline, mapping, epoch and refund recipient; do not reroll to recover failed delivery. Unused local snapshots can remain for 50 epochs with live-work protection.
@@ -13,3 +13,5 @@ Epochs last 200 blocks. The keeper prepares snapshots locally without idle publi
 Both service endpoints are initialized UUPS proxies with two-step owners. Stable addresses do not identify implementation code: verify both implementation histories and initialized configuration. Upgrade authority is trusted. The registry committer and coordinator payout/share are administrable without an operational request-input setter.
 
 Configure CHAIN_ID explicitly; Arc is one network, not an assumed default or service name. Telegram is opt-in and configured-chat-only with read-only /status and /keeper; no access is available by default. Public evidence and receipts are authoritative, while health and notifications are observations. Consumer integration does not authorize upgrades, key access, funding, bot messages or publishing.
+
+Install `@d20dao/vrf-sdk` from npm. The website Getting started and Copy prompt resources are backed by `/llms.txt`, `/llms-full.txt`, `/agents.md` and per-guide plain-text prompts. Respect the user's requested task and use the relevant skill rather than treating an integration prompt as operator authorization.

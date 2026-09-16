@@ -26,4 +26,4 @@ An implementation change stops the keeper until explicit review and updated pins
 
 ## Optional refund notification
 
-In the source revision above, `refundRequest` settles the fixed recipient payment or backed credit before notifying the original consumer with `onRefund(requestId)`. Notification failure does not undo settlement. `retryRefundCallback(requestId, gasLimit)` retries only the notice, never a second payment or randomness. Check `refundCallbackDelivered` and `RefundCallbackAttempted` separately from refund credit. Confirm the deployed implementation supports this hook; the current pilot manifest may still reference the earlier implementation.
+`refundRequest` settles the fixed recipient payment or backed credit before notifying the original consumer with `onRefund(requestId)`. Notification failure does not undo settlement. `retryRefundCallback(requestId, gasLimit)` retries only the notice, never a second payment or randomness. Check `refundCallbackDelivered` and `RefundCallbackAttempted` separately from refund credit. The current Arc Testnet manifest records the activated refund-hook upgrade; check the actual implementation on the selected chain.
