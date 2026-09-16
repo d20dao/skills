@@ -75,7 +75,7 @@ These guides follow public protocol commit `200c5ad4976f487db60561171d7ed5dd63ea
 
 ## Arc Testnet pilot
 
-A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Any consumer contract can request service by paying its quoted fee; no allowlist is required. The [small-sample measurements](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-pilot-2026-09-15.json) cover proof acceptance, same-result callback repair and expired-request refunds; they are not an SLA.
+A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Any consumer contract can request service by paying its quoted fee; no allowlist is required. The [testnet stress run](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-stress-2026-09-16.json) served 68 paid requests within 2–4 chain seconds, 47 of them in batched fulfillments; measured timings are not an SLA.
 
 ## Getting started with an agent
 
