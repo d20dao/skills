@@ -5,9 +5,9 @@ description: Build and consume the d20dao randomness SDK for on-demand epoch evi
 
 Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
 
-Install with `npm install @d20dao/vrf-sdk`. Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Package installation and live consumer onboarding are separate steps.
+Install with `npm install @d20dao/vrf-sdk`. Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Use the selected deployment proxy and its current exact fee for public requests.
 
-The keeper prepares local snapshots for 200-block epochs. Idle work causes no publication transaction; unused snapshots can remain for 50 epochs. Live allowlisted demand escrows the exact fee, triggers saved-packet publication and resolves targetBlock=max(requestBlock,commitBlock+1). The original 60-second deadline remains fixed.
+The keeper prepares local snapshots for 200-block epochs. Idle work causes no publication transaction; unused snapshots can remain for 50 epochs. Live paid demand escrows the exact fee, triggers saved-packet publication and resolves targetBlock=max(requestBlock,commitBlock+1). The original 60-second deadline remains fixed.
 
 Use Node >=22.13 and Solidity 0.8.28. For SDK development, use repository npm ci/test and npm pack; application developers can install directly from npm. For library-specific syntax use current official docs or Context7. Publishing credentials are unnecessary for dependency installation and must not be read or used by ordinary package checks.
 
@@ -15,6 +15,6 @@ Root exports include mapping, encodeEvidencePacket/decodeEvidencePacket, replayC
 
 RequestContext binds requestBlock and targetBlock. Replay configuration.feeRecipient is the initialized initialFeeRecipient, not the mutable payout address. Use effective proxy addresses and independently trusted implementation history. Proof evidence remains 416 bytes and fulfillment calldata 452 bytes; epoch evidence carries the full signed packet. Decoding/mapping are not proof verification.
 
-Consumer imports use @d20dao/vrf-sdk/contracts/D20VRFConsumer.sol, interfaces/ID20VRF.sol and libraries/D20VRFRequests.sol with compiler 0.8.28. DiceConsumer.sol is one example, not the product scope. Obtain service onboarding before live requests.
+Consumer imports use @d20dao/vrf-sdk/contracts/D20VRFConsumer.sol, interfaces/ID20VRF.sol and libraries/D20VRFRequests.sol with compiler 0.8.28. DiceConsumer.sol is one example, not the product scope. No consumer onboarding is required for the public service.
 
 Build from exact reviewed protocol Git blobs, preserving vendor/licenses and hashes. The UUPS ABI build uses OpenZeppelin contracts and contracts-upgradeable 5.6.1. Do not hand-edit generated output or add operators, keys, fixtures or provers to the tarball. Distinguish explicit CI fixtures from actual API3 signatures; a Node-executed browser-target bundle is not a live browser test. Successful packaging does not approve release, upgrades or deployment.

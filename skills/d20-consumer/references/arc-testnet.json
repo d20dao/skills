@@ -2,7 +2,7 @@
   "network": "Arc Testnet",
   "chainId": 5042002,
   "snapshotDate": "2026-09-16",
-  "sdk": "@d20dao/vrf-sdk@0.1.1",
+  "sdk": "@d20dao/vrf-sdk@0.1.2",
   "protocolSourceCommit": "d7e785dda57499220bd37d73bc6fad9226872dcc",
   "manifest": "https://d20dao.org/deployments/arc-testnet.json",
   "contracts": {
@@ -21,5 +21,6 @@
       "implementation": "0xd20dA0Ec8d33fB04184CbC13942657bDC1f5Bbc0",
       "implementationCodeHash": "0xdea8af7351e8fba4152bf1c7e47a1cb72e0339070c5b6bb069f004484f7c4163"
     }
-  }
+  },
+  "consumerAccess": "public"
 }

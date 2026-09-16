@@ -27,7 +27,7 @@ Chain ID **5042002**. Connect applications to the **coordinator proxy**.
 
 The [deployment reference](skills/d20-consumer/references/arc-testnet.md) includes implementation addresses and runtime hashes. Snapshot: 16 September 2026, after the refund-notification upgrade. Use the [current public manifest](https://d20dao.org/deployments/arc-testnet.json) for the selected deployment. The pilot consumer is restricted test tooling, not a shared endpoint for applications.
 
-Read `requestFee()` at runtime. The pilot currently uses a 0.05 native test USDC fee (18 decimals); transaction gas is separate. Arrange consumer allowlisting before live pilot requests.
+Read `requestFee()` at runtime. The pilot currently uses a 0.05 native test USDC fee (18 decimals); transaction gas is separate. No consumer registration or allowlisting is needed.
 
 ## Give this task to your agent
 
@@ -65,7 +65,7 @@ These guides follow public protocol commit `d7e785dda57499220bd37d73bc6fad922687
 
 ## Arc Testnet pilot
 
-A restricted pilot is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Consumer allowlisting is required. The [small-sample measurements](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-pilot-2026-09-15.json) cover proof acceptance, same-result callback repair and expired-request refunds; they are not an SLA. The SDK is available on npm; the manifest records the activated refund-notification upgrade.
+A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Any consumer contract can request service by paying the current exact fee; no allowlist is required. The [small-sample measurements](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-pilot-2026-09-15.json) cover proof acceptance, same-result callback repair and expired-request refunds; they are not an SLA. The SDK is available on npm; the manifest records the activated refund-notification upgrade.
 
 ## Getting started with an agent
 
