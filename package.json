@@ -1,0 +1,9 @@
+{
+  "name": "d20dao-skills-checks",
+  "private": true,
+  "type": "module",
+  "scripts": { "check": "node scripts/check-examples.mjs" },
+  "devDependencies": { "@d20dao/vrf-sdk": "0.1.1", "solc": "0.8.28" },
+  "overrides": { "solc": { "tmp": "0.2.7" } },
+  "engines": { "node": ">=22.13.0" }
+}
