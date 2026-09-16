@@ -3,9 +3,9 @@ name: d20-sdk
 description: Build and consume the d20dao randomness SDK for on-demand epoch evidence, VRF replay, mapping, off-chain fee quoting, ABI and Solidity imports.
 ---
 
-Public protocol reference: `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `640b60cb992a7e3add1efe8e7b392341732ea004`. Match installed SDK provenance and deployed implementation history before use.
 
-Install with `npm install @d20dao/vrf-sdk` (0.2.0 or newer). Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Use the selected deployment proxy and quote its fee per request.
+Install with `npm install @d20dao/vrf-sdk` (0.3.0 or newer). Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Use the selected deployment proxy and quote its fee per request.
 
 Fees are `max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))`; `pricing()` returns the live parameters. `ID20VRF.quoteFee(callbackGasLimit)` is exact only inside the requesting transaction. Off-chain, use `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })`: it reads the latest header's `baseFeePerGas`, calls `quoteFeeAt` and returns the exact quote for that header plus a buffered amount to send; do not quote with `quoteFee` through `eth_call`, which commonly sees a zero base fee. Excess becomes refund credit of the refund address (`withdrawRefundCredit`); underpayment reverts with `IncorrectFee(expected, actual)`.
 

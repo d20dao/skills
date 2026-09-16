@@ -6,14 +6,14 @@ Use the coordinator proxy for requests. Implementation addresses are reference i
 
 | Contract | Proxy | Implementation |
 | --- | --- | --- |
-| Coordinator | `0xd20Da07c98F6A64CA20084fD5905abF19F5D84ac` | `0xD20da02c34489c8eC68ca1D4FC8fe5ea79ADD223` |
-| Epoch registry | `0xd20Da08e4E903cBD2F99fD5F4Be021FC1a9fA496` | `0xD20da079ccEf2CE273b8f2356abccE8c97c73F17` |
-| Restricted pilot consumer | `0xd20dA0e6d4405B40040d458F8010191712E2Cb42` | `0xD20DA00A872acfDe3e4721Fc1051BD23CC84B66b` |
+| Coordinator | `0xd20DA0FF9087d053f0291524Eac12abA1ADBd945` | `0xD20da0c375cEfCdA65703699A4090237057e9b68` |
+| Epoch registry | `0xD20Da00B47A7cD2211dC4683E306913b05903756` | `0xD20Da0cf7Ddc6123f9A87c0C210F8ECB934CA7D5` |
+| Restricted cost client | `0xD20da026090B8472579a2B93030F1fC4c94807F1` | `0xD20DA00A872acfDe3e4721Fc1051BD23CC84B66b` |
 
 Runtime hashes and machine-readable values are in [arc-testnet.json](arc-testnet.json). The [current public manifest](https://d20dao.org/deployments/arc-testnet.json) retains upgrade receipts and previous implementation identities for old proofs.
 
 Read `pricing()` and `keeperFeeBps()` at the selected coordinator; native test USDC uses 18 decimals. Any consumer contract can request service by paying its quoted fee (see [methods](methods.md)); no allowlist is required. Deployment and funding of your own application follow the user's instructions.
 
-Contract source commit recorded by the manifest for this snapshot: `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match the installed SDK's `PROTOCOL-PROVENANCE.json` to the deployment in use. A stable proxy address does not establish unchanged implementation behavior.
+Contract source commit recorded by the manifest for this snapshot: `640b60cb992a7e3add1efe8e7b392341732ea004`. Match the installed SDK's `PROTOCOL-PROVENANCE.json` to the deployment in use. A stable proxy address does not establish unchanged implementation behavior.
 
-Request replay URL: `https://d20dao.org/explorer/request/5042002/0xd20Da07c98F6A64CA20084fD5905abF19F5D84ac/<requestId>`.
+Request replay URL: `https://d20dao.org/explorer/request/5042002/0xd20DA0FF9087d053f0291524Eac12abA1ADBd945/<requestId>`.

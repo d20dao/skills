@@ -2,22 +2,22 @@
   "network": "Arc Testnet",
   "chainId": 5042002,
   "snapshotDate": "2026-09-16",
-  "sdk": "@d20dao/vrf-sdk@0.2.0",
-  "protocolSourceCommit": "200c5ad4976f487db60561171d7ed5dd63eaa94c",
+  "sdk": "@d20dao/vrf-sdk@0.3.0",
+  "protocolSourceCommit": "640b60cb992a7e3add1efe8e7b392341732ea004",
   "manifest": "https://d20dao.org/deployments/arc-testnet.json",
   "contracts": {
     "coordinator": {
-      "proxy": "0xd20Da07c98F6A64CA20084fD5905abF19F5D84ac",
-      "implementation": "0xD20da02c34489c8eC68ca1D4FC8fe5ea79ADD223",
-      "implementationCodeHash": "0x48959d85130cc5d1de7700e16a9e14f5b0877bcc06ef1263fa664d599a060658"
+      "proxy": "0xd20DA0FF9087d053f0291524Eac12abA1ADBd945",
+      "implementation": "0xD20da0c375cEfCdA65703699A4090237057e9b68",
+      "implementationCodeHash": "0x39360c272bc4806b66b6f3928f6f5f2bff240d186aba0e09cbbdc574c3c1622f"
     },
     "epochRegistry": {
-      "proxy": "0xd20Da08e4E903cBD2F99fD5F4Be021FC1a9fA496",
-      "implementation": "0xD20da079ccEf2CE273b8f2356abccE8c97c73F17",
-      "implementationCodeHash": "0x1f9c3fb2616e87c84c76c19165f4fc864c52097b15d9c5353e1b7457e4b6de0f"
+      "proxy": "0xD20Da00B47A7cD2211dC4683E306913b05903756",
+      "implementation": "0xD20Da0cf7Ddc6123f9A87c0C210F8ECB934CA7D5",
+      "implementationCodeHash": "0xeb8c6ff3a703f40153d67729112228e6a02bd9745680ca8afeedf99bd1a40a09"
     },
-    "pilotConsumer": {
-      "proxy": "0xd20dA0e6d4405B40040d458F8010191712E2Cb42",
+    "costClient": {
+      "proxy": "0xD20da026090B8472579a2B93030F1fC4c94807F1",
       "implementation": "0xD20DA00A872acfDe3e4721Fc1051BD23CC84B66b",
       "implementationCodeHash": "0xb30bd76592fc6def770bf8599a4dcfa827ce4fe1e951000d462c74d488b53e91"
     }

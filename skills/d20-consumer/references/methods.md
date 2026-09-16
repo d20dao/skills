@@ -1,6 +1,6 @@
 # SDK methods and result semantics
 
-Use `@d20dao/vrf-sdk` 0.2.0 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
+Use `@d20dao/vrf-sdk` 0.3.0 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
 
 | Result | TypeScript mapping spec | Solidity request helper | Returned values |
 | --- | --- | --- | --- |

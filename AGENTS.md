@@ -18,4 +18,4 @@ Both service endpoints are initialized UUPS proxies with two-step owners; `renou
 
 Configure CHAIN_ID explicitly; Arc is one network, not an assumed default or service name. Telegram is opt-in and configured-chat-only with read-only /status and /keeper; no access is available by default. Public evidence and receipts are authoritative, while health and notifications are observations. Consumer integration does not authorize upgrades, key access, funding, bot messages or publishing.
 
-Install `@d20dao/vrf-sdk` (0.2.0 or newer) from npm. The website Getting started and Copy prompt resources are backed by `/llms.txt`, `/llms-full.txt`, `/agents.md` and per-guide plain-text prompts. Respect the user's requested task and use the relevant skill rather than treating an integration prompt as operator authorization.
+Install `@d20dao/vrf-sdk` (0.3.0 or newer) from npm. The website Getting started and Copy prompt resources are backed by `/llms.txt`, `/llms-full.txt`, `/agents.md` and per-guide plain-text prompts. Respect the user's requested task and use the relevant skill rather than treating an integration prompt as operator authorization.

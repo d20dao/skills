@@ -3,11 +3,11 @@ name: d20-keeper
 description: Configure, observe and recover d20dao-keeper with on-demand snapshots, UUPS implementation pins and one durable nonce lane.
 ---
 
-Public protocol reference: `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `640b60cb992a7e3add1efe8e7b392341732ea004`. Match installed SDK provenance and deployed implementation history before use.
 
 Read canonical AGENTS.md, keeper/README.md, keeper/MIGRATION.md, keeper/TELEGRAM.md and deploy/docker/README.md as relevant. Match reviewed source and deployment configuration. Successful setup is not production approval.
 
-Epochs last 200 blocks. The source anchor is start-1; four recipe slots cover Hyperliquid, ANU and TickerLayer BTCUSD/ETHUSD. Prepare the first validated snapshot locally and persist it unchanged. Idle preparation has no publication transaction. Unused snapshots can remain for 50 epochs/10,000 blocks, with live demand and unresolved nonce protection. A live paid request triggers publication; its target becomes max(original requestBlock,commitBlock+1). Never extend its original 60-second deadline, change query or refresh persisted data for another outcome.
+Epochs last 200 blocks. The source anchor is start-1; four recipe slots cover Hyperliquid, ANU and TickerLayer BTCUSD/ETHUSD. Prepare the first validated snapshot locally and persist it unchanged. Idle preparation has no publication transaction. Unused snapshots can remain for 50 epochs/10,000 blocks, with live demand and unresolved nonce protection. A live paid request triggers publication; its target becomes max(original requestBlock,commitBlock+1). If the selected source yields no valid packet, move through the fixed fallback order: attempt n (1–3) is the slot n positions later, fetched and committed with commitEpochFallback only from n × 20 blocks into the epoch; never skip a source that produced a valid packet. Never extend its original 60-second deadline, change query outside that order or refresh persisted data for another outcome.
 
 The daemon is outbound-only. Epoch publication and fulfillment share one wallet nonce lane; HTTP work cannot sign. Use a dedicated transaction wallet and separate VRF key. Registry committer authorization must match the transaction wallet. Core variable names are generic: RPC_URLS, CHAIN_ID, COORDINATOR_ADDRESS, KEEPER_DB, TX_KEY_FILE, VRF_KEY_FILE and SEND_TRANSACTIONS. CHAIN_ID is required explicitly; no Arc default is assumed. Keep sends disabled until authorized.
 

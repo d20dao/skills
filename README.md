@@ -8,7 +8,7 @@ Help coding agents add verifiable randomness to existing application contracts w
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.2.0 or newer, Node 22.13+ and Solidity 0.8.28. Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.3.0 or newer, Node 22.13+ and Solidity 0.8.28. Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
@@ -21,11 +21,11 @@ Chain ID **5042002**. Connect applications to the **coordinator proxy**.
 
 | Contract | Proxy address |
 | --- | --- |
-| D20VRFCoordinator | `0xd20Da07c98F6A64CA20084fD5905abF19F5D84ac` |
-| EpochEntropy | `0xd20Da08e4E903cBD2F99fD5F4Be021FC1a9fA496` |
-| Restricted pilot consumer | `0xd20dA0e6d4405B40040d458F8010191712E2Cb42` |
+| D20VRFCoordinator | `0xd20DA0FF9087d053f0291524Eac12abA1ADBd945` |
+| EpochEntropy | `0xD20Da00B47A7cD2211dC4683E306913b05903756` |
+| Restricted cost client | `0xD20da026090B8472579a2B93030F1fC4c94807F1` |
 
-The [deployment reference](skills/d20-consumer/references/arc-testnet.md) includes implementation addresses and runtime hashes. Snapshot: 16 September 2026. Use the [current public manifest](https://d20dao.org/deployments/arc-testnet.json) for the selected deployment. The pilot consumer is restricted test tooling, not a shared endpoint for applications.
+The [deployment reference](skills/d20-consumer/references/arc-testnet.md) includes implementation addresses and runtime hashes. Snapshot: 16 September 2026. Use the [current public manifest](https://d20dao.org/deployments/arc-testnet.json) for the selected deployment. The cost client is restricted test tooling, not a shared endpoint for applications.
 
 ## Fees
 
@@ -43,7 +43,7 @@ Example with the mainnet initialization defaults (minFee 0.08 USDC, multiplier 5
 Use the d20-consumer skill from https://github.com/d20dao/skills to add
 D20DAO randomness to my existing contract. Inspect its architecture and
 preserve authorization, storage, initialization and application payments.
-Install @d20dao/vrf-sdk 0.2.0 or newer, read its AGENTS.md and provenance,
+Install @d20dao/vrf-sdk 0.3.0 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain. Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
@@ -71,7 +71,7 @@ Both service contracts use initialized UUPS proxies with two-step ownership; `re
 
 Match the installed SDK provenance and deployed implementation history before use. Install the SDK with `npm install @d20dao/vrf-sdk`. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
-These guides follow public protocol commit `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
+These guides follow public protocol commit `640b60cb992a7e3add1efe8e7b392341732ea004`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
 
 ## Arc Testnet pilot
 
