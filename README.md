@@ -21,9 +21,9 @@ Chain ID **5042002**. Connect applications to the **coordinator proxy**.
 
 | Contract | Proxy address |
 | --- | --- |
-| D20VRFCoordinator | `0xd20dA0fDa41f84FCfA3423ae9F96B15910587B4E` |
-| EpochEntropy | `0xd20Da04e4D6d97a762A5b56993d723AA7663F204` |
-| Restricted pilot consumer | `0xD20Da0Ab4F5c258d579D18dC5a6e652266BB9a20` |
+| D20VRFCoordinator | `0xd20Da07c98F6A64CA20084fD5905abF19F5D84ac` |
+| EpochEntropy | `0xd20Da08e4E903cBD2F99fD5F4Be021FC1a9fA496` |
+| Restricted pilot consumer | `0xd20dA0e6d4405B40040d458F8010191712E2Cb42` |
 
 The [deployment reference](skills/d20-consumer/references/arc-testnet.md) includes implementation addresses and runtime hashes. Snapshot: 16 September 2026. Use the [current public manifest](https://d20dao.org/deployments/arc-testnet.json) for the selected deployment. The pilot consumer is restricted test tooling, not a shared endpoint for applications.
 

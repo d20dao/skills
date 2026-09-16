@@ -3,7 +3,7 @@ name: d20-keeper
 description: Configure, observe and recover d20dao-keeper with on-demand snapshots, UUPS implementation pins and one durable nonce lane.
 ---
 
-Public protocol reference: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `200c5ad4976f487db60561171d7ed5dd63eaa94c`. Match installed SDK provenance and deployed implementation history before use.
 
 Read canonical AGENTS.md, keeper/README.md, keeper/MIGRATION.md, keeper/TELEGRAM.md and deploy/docker/README.md as relevant. Match reviewed source and deployment configuration. Successful setup is not production approval.
 
