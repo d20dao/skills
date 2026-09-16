@@ -82,4 +82,4 @@ npm ci
 npm run check
 ```
 
-This compiles the consumer against the published SDK and checks mapping examples and provenance. It sends no chain transaction and needs no operator credentials.
+This compiles the consumer against the installed SDK, checks that every coordinator function the template declares exists in `coordinatorAbi`, and validates the mapping examples and deployment provenance. It sends no chain transaction and needs no operator credentials. To verify against protocol sources that are not published yet, point `D20_SDK_DIR` at a directory containing the protocol `contracts/` tree (a keeper checkout or the SDK repository's `protocol/` folder); the provenance comparison is skipped when that directory has no `PROTOCOL-PROVENANCE.json`.
