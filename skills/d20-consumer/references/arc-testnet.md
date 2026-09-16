@@ -1,6 +1,6 @@
 # Arc Testnet deployment reference
 
-Chain ID: **5042002**. Snapshot copied from the deployment manifest on **2026-09-16**. SDK: `@d20dao/vrf-sdk@0.1.2`.
+Chain ID: **5042002**. Snapshot copied from the deployment manifest on **2026-09-16**.
 
 Use the coordinator proxy for requests. Implementation addresses are reference identities, not consumer entry points.
 
@@ -12,8 +12,8 @@ Use the coordinator proxy for requests. Implementation addresses are reference i
 
 Runtime hashes and machine-readable values are in [arc-testnet.json](arc-testnet.json). The [current public manifest](https://d20dao.org/deployments/arc-testnet.json) retains upgrade receipts and previous implementation identities for old proofs.
 
-The coordinator refund-notification implementation was activated at block 62310349. Read the actual fee at the selected coordinator; the current pilot fee is 0.05 native test USDC, using 18 decimals. Any consumer contract can request service by paying the current exact fee; no allowlist is required. Deployment and funding of your own application follow the user's instructions.
+Read `pricing()` and `keeperFeeBps()` at the selected coordinator; native test USDC uses 18 decimals. Any consumer contract can request service by paying its quoted fee (see [methods](methods.md)); no allowlist is required. Deployment and funding of your own application follow the user's instructions.
 
-Public protocol source: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match the installed SDK's `PROTOCOL-PROVENANCE.json`. A stable proxy address does not establish unchanged implementation behavior.
+Contract source commit recorded by the manifest for this snapshot: `d7e785dda57499220bd37d73bc6fad9226872dcc`. Match the installed SDK's `PROTOCOL-PROVENANCE.json` to the deployment in use. A stable proxy address does not establish unchanged implementation behavior.
 
 Request replay URL: `https://d20dao.org/explorer/request/5042002/0xd20dA0fDa41f84FCfA3423ae9F96B15910587B4E/<requestId>`.
