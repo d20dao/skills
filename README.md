@@ -8,7 +8,7 @@ Help coding agents add verifiable randomness to existing application contracts w
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.3.3 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.4.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
@@ -64,7 +64,7 @@ Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5
 Use the d20-consumer skill from https://github.com/d20dao/skills to add
 D20DAO randomness to my existing contract. Inspect its architecture and
 preserve authorization, storage, initialization and application payments.
-Install @d20dao/vrf-sdk 0.3.3 or newer, read its AGENTS.md and provenance,
+Install @d20dao/vrf-sdk 0.4.0 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain. Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
@@ -94,7 +94,7 @@ Both service contracts use initialized UUPS proxies with two-step ownership; `re
 
 Match the installed SDK provenance and deployed implementation history before use. Install the SDK with `npm install @d20dao/vrf-sdk`. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
-These guides follow public protocol commit `640b60cb992a7e3add1efe8e7b392341732ea004`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
+These guides follow public protocol commit `5cb939a27983e037bc4173dbaa2f021bd223dfbc`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history; each manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release. Operator backend changes do not by themselves alter this public protocol pin.
 
 ## Arc Testnet pilot
 

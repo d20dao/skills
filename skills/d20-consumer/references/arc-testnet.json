@@ -1,8 +1,8 @@
 {
   "network": "Arc Testnet",
   "chainId": 5042002,
-  "snapshotDate": "2026-09-16",
-  "sdk": "@d20dao/vrf-sdk@0.3.3",
+  "snapshotDate": "2026-09-17",
+  "sdk": "@d20dao/vrf-sdk@0.4.0",
   "protocolSourceCommit": "640b60cb992a7e3add1efe8e7b392341732ea004",
   "manifest": "https://d20dao.org/deployments/arc-testnet.json",
   "contracts": {
@@ -13,8 +13,9 @@
     },
     "epochRegistry": {
       "proxy": "0xD20Da00B47A7cD2211dC4683E306913b05903756",
-      "implementation": "0xD20Da0cf7Ddc6123f9A87c0C210F8ECB934CA7D5",
-      "implementationCodeHash": "0xeb8c6ff3a703f40153d67729112228e6a02bd9745680ca8afeedf99bd1a40a09"
+      "implementation": "0xD20dA0311C56f92d841d5c74F15ec691e0cfB960",
+      "implementationCodeHash": "0xd691b5ca05e7c917e8e95f22d535aaa79de4073805162a5be3bca7f2acdb2a8f",
+      "implementationSourceCommit": "96cc722a8c7e1b7f2389e162fe96fb3c314de47f"
     },
     "costClient": {
       "proxy": "0xD20da026090B8472579a2B93030F1fC4c94807F1",
