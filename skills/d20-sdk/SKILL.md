@@ -3,7 +3,7 @@ name: d20-sdk
 description: Build and consume the d20dao randomness SDK for on-demand epoch evidence, VRF replay, mapping, off-chain fee quoting, ABI and Solidity imports.
 ---
 
-Public protocol reference: `80c6b4b3451dd497399a8d91e3035585965d9ab9`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `e1dc473d87db69b916d9f6919a62d8ea8ee24487`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Install with `npm install @d20dao/vrf-sdk` (0.4.0 or newer). Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json. Match the reviewed canonical commit and deployed proxy implementations. Use the selected deployment proxy and quote its fee per request.
 

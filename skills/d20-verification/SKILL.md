@@ -3,7 +3,7 @@ name: d20-verification
 description: Verify d20dao epoch API3 evidence, fixed-key VRF results and mappings using trusted request, publication, per-epoch recipe catalog and proxy history.
 ---
 
-Public protocol reference: `80c6b4b3451dd497399a8d91e3035585965d9ab9`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `e1dc473d87db69b916d9f6919a62d8ea8ee24487`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Use the public @d20dao/vrf-sdk. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
 
