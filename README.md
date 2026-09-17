@@ -8,7 +8,7 @@ Help coding agents add verifiable randomness to existing application contracts w
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.3.0 or newer, Node 22.13+ and Solidity 0.8.28. Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.3.3 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
@@ -47,7 +47,7 @@ Each request pays `fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOver
 - An off-chain sender quotes `quoteFeeAt(callbackGasLimit, latestBlock.baseFeePerGas)` plus a buffer for base-fee movement, because `eth_call` commonly reports a base fee of 0 and `quoteFee` then returns only `minFee`. The SDK helper `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` does this.
 - `msg.value` below the transaction's own quote reverts with `IncorrectFee(expected, actual)`. Any excess is credited to the refund address as refund credit (`FeeOverpaymentCredited`), withdrawable by that address with `withdrawRefundCredit(recipient)`; it is never revenue.
 
-Example with the mainnet initialization defaults (minFee 0.08 USDC, multiplier 5, overhead 300,000 gas) and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
+Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. These are initialization values: `pricing()` returns the live values, which the owner may change within bounds. Example with the initialization values and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
 
 ## Give this task to your agent
 
@@ -55,7 +55,7 @@ Example with the mainnet initialization defaults (minFee 0.08 USDC, multiplier 5
 Use the d20-consumer skill from https://github.com/d20dao/skills to add
 D20DAO randomness to my existing contract. Inspect its architecture and
 preserve authorization, storage, initialization and application payments.
-Install @d20dao/vrf-sdk 0.3.0 or newer, read its AGENTS.md and provenance,
+Install @d20dao/vrf-sdk 0.3.3 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain. Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
@@ -75,7 +75,7 @@ for deployment and funded transactions.
 | d20-sdk | Install and use the published SDK |
 | d20-keeper | Advanced: authorized operation of your own keeper |
 
-Copy the required folder into the agent skill directory. Each supports explicit invocation and normal automatic discovery. Canonical sources are [keeper](https://github.com/d20dao/keeper) and [SDK](https://github.com/d20dao/d20-sdk).
+Copy the required folder into the agent skill directory. Each supports explicit invocation and normal automatic discovery. Canonical public sources are the [SDK](https://github.com/d20dao/d20-sdk) and its [protocol/](https://github.com/d20dao/d20-sdk/tree/main/protocol) folder, which holds the protocol contracts and replay code copied from the commit named in its `PROTOCOL-PROVENANCE.json`.
 
 The keeper prepares 200-block epoch snapshots locally. Idle snapshots cause no publication transaction and can remain for 50 epochs. Live paid demand triggers publication, then randomness binds a canonical future block. Requests retain their original 60-second deadline and fixed refund address. The coordinator fulfills up to 16 requests per transaction with unchanged per-request events.
 
@@ -87,11 +87,11 @@ These guides follow public protocol commit `640b60cb992a7e3add1efe8e7b392341732e
 
 ## Arc Testnet pilot
 
-A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [keeper deployment manifest](https://github.com/d20dao/keeper/blob/main/deployments/arc-testnet.json). Any consumer contract can request service by paying its quoted fee; no allowlist is required. The [testnet stress run](https://github.com/d20dao/keeper/blob/main/docs/benchmarks/arc-testnet-stress-2026-09-16.json) served 68 paid requests within 2–4 chain seconds, 47 of them in batched fulfillments; measured timings are not an SLA.
+A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [Arc Testnet deployment manifest](https://d20dao.org/deployments/arc-testnet.json) (Arc Mainnet: [arc-mainnet.json](https://d20dao.org/deployments/arc-mainnet.json)). Any consumer contract can request service by paying its quoted fee; no allowlist is required. A request must be served within 60 seconds or it becomes refundable. A single request is normally fulfilled within a few seconds; in a stress test 200 simultaneous requests were delivered within 36 seconds (median 19 seconds), and an Arc Testnet run on 2026-09-16 served 68 paid requests within 2–4 chain seconds, 47 of them in batched fulfillments. Measured timings are not an SLA.
 
 ## Getting started with an agent
 
-Start with the website Getting started guide and its Copy prompt action. `/llms.txt` indexes the public guides; `/llms-full.txt` contains complete text; `/agents.md` and `/AGENTS.md` provide integration instructions. Each guide exposes `/prompts/<guide-slug>.txt`. Use `d20-consumer` for an application, then `d20-lifecycle` and `d20-verification` for settlement and evidence.
+Start with the [Getting started](https://d20dao.org/docs/getting-started) guide on the d20dao.org website and its Copy prompt action. `https://d20dao.org/llms.txt` indexes the public guides; `https://d20dao.org/llms-full.txt` contains complete text; `https://d20dao.org/agents.md` and `https://d20dao.org/AGENTS.md` provide integration instructions. Each guide exposes `https://d20dao.org/prompts/<guide-slug>.txt`. Use `d20-consumer` for an application, then `d20-lifecycle` and `d20-verification` for settlement and evidence.
 
 Public entry points: [Getting started](https://d20dao.org/docs/getting-started), [SDK on npm](https://www.npmjs.com/package/@d20dao/vrf-sdk), [agent guide](https://d20dao.org/agents.md), [full text docs](https://d20dao.org/llms-full.txt) and [Explorer](https://d20dao.org/explorer).
 
@@ -104,4 +104,4 @@ npm ci
 npm run check
 ```
 
-This compiles the consumer against the installed SDK, checks that every coordinator function the template declares exists in `coordinatorAbi`, and validates the mapping examples and deployment provenance. It sends no chain transaction and needs no operator credentials. To verify against protocol sources that are not published yet, point `D20_SDK_DIR` at a directory containing the protocol `contracts/` tree (a keeper checkout or the SDK repository's `protocol/` folder); the provenance comparison is skipped when that directory has no `PROTOCOL-PROVENANCE.json`.
+This compiles the consumer against the installed SDK, checks that every coordinator function the template declares exists in `coordinatorAbi`, and validates the mapping examples and deployment provenance. It sends no chain transaction and needs no operator credentials.

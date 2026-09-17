@@ -2,7 +2,7 @@
   "network": "Arc Mainnet",
   "chainId": 5042,
   "snapshotDate": "2026-09-17",
-  "sdk": "@d20dao/vrf-sdk@0.3.1",
+  "sdk": "@d20dao/vrf-sdk@0.3.3",
   "protocolSourceCommit": "640b60cb992a7e3add1efe8e7b392341732ea004",
   "manifest": "https://d20dao.org/deployments/arc-mainnet.json",
   "contracts": {

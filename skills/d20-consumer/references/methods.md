@@ -1,6 +1,6 @@
 # SDK methods and result semantics
 
-Use `@d20dao/vrf-sdk` 0.3.0 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
+Use `@d20dao/vrf-sdk` 0.3.3 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
 
 | Result | TypeScript mapping spec | Solidity request helper | Returned values |
 | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ All callbacks receive `(requestId, rawWord)`, including mapped requests. Store t
 
 Off-chain quoting example (ethers v6): read `baseFeePerGas` from the latest block, call `quoteFeeAt(callbackGasLimit, baseFeePerGas)`, then send the quote recomputed at a buffered base fee. The SDK's `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` returns both the exact quote for that header (`fee`) and the buffered amount to send (`value`). Do not call `quoteFee` through `eth_call`: it commonly reports a base fee of 0 and returns only `minFee`.
 
-Labelled example with the mainnet initialization defaults (minFee 0.08 USDC, multiplier 5, overhead 300,000 gas) and `callbackGasLimit` 100,000:
+Labelled example with the initialization values of both Arc deployments (0.08 USDC minimum fee, multiplier 5, overhead 300,000 gas; `pricing()` returns the live values, which the owner may change within bounds) and `callbackGasLimit` 100,000:
 
 | Header base fee | 5 × baseFee × 400,000 | Fee paid |
 | --- | --- | --- |
