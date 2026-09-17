@@ -6,7 +6,7 @@ The main task is adding randomness to an existing application contract. Begin wi
 
 - Use d20-consumer for D20VRFConsumer/ID20VRF integration, fee quoting, refund credit, callback authentication and deterministic mappings.
 - Use d20-lifecycle for pending publication, target readiness, timely acceptance, batch fulfillment events, same-result callback retry and fixed-recipient refunds.
-- Use d20-verification for trusted proxy/epoch/request evidence and public replay. RequestContext includes original requestBlock and resolved targetBlock; replay configuration uses initialFeeRecipient and initialMinFee, and the signer catalog in force for the request's epoch.
+- Use d20-verification for trusted proxy/epoch/request evidence and public replay. RequestContext includes original requestBlock and resolved targetBlock; replay configuration uses initialFeeRecipient and initialMinFee, and the source catalog (recipes and signers) in force for the request's epoch.
 - Use d20-sdk for public exports, ABI/initializer shapes, Solidity imports, off-chain fee quoting and npm package usage.
 - Use d20-keeper for authorized operator setup, observation and recovery, including implementation pins, fee budgets and one durable nonce lane.
 

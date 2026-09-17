@@ -94,7 +94,7 @@ Both service contracts use initialized UUPS proxies with two-step ownership; `re
 
 Match the installed SDK provenance and deployed implementation history before use. Install the SDK with `npm install @d20dao/vrf-sdk`. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
 
-These guides follow public protocol commit `640b60cb992a7e3add1efe8e7b392341732ea004`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
+These guides follow public protocol commit `8a1c53d57e1447fb0d38620290823a9c5ad77c77` (@d20dao/vrf-sdk 0.4.0), which also replays epochs published by the deployed release `640b60cb992a7e3add1efe8e7b392341732ea004`; the examples check still runs against the published SDK 0.3.4 until 0.4.0 is released. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history. Operator backend changes do not by themselves alter this public protocol pin.
 
 ## Arc Testnet pilot
 

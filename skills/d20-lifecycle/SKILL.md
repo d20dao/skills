@@ -3,7 +3,7 @@ name: d20-lifecycle
 description: Diagnose d20dao on-demand publication, VRF deadlines, batch fulfillment, callback retries, fixed-recipient refunds and refund credit from chain evidence.
 ---
 
-Public protocol reference: `640b60cb992a7e3add1efe8e7b392341732ea004`. Match installed SDK provenance and deployed implementation history before use.
+Public protocol reference: `8a1c53d57e1447fb0d38620290823a9c5ad77c77` (@d20dao/vrf-sdk 0.4.0), which also replays epochs published by the deployed release `640b60cb992a7e3add1efe8e7b392341732ea004`. Match installed SDK provenance and deployed implementation history before use.
 
 Read current D20VRFCoordinator/EpochEntropy sources, actual proxy ABIs, implementation history and SDK provenance. Logs and health are observations; trusted receipts and state establish outcomes.
 
@@ -13,7 +13,7 @@ Idle local preparation produces no publication transaction. An unpublished idle 
 | --- | --- |
 | Request reverted with IncorrectFee(expected, actual) | msg.value was below the transaction's own quote; no request exists. Re-quote with quoteFeeAt and the latest base fee plus a buffer. |
 | FeeOverpaymentCredited(requestId, refundAddress, amount) | The excess over the quote is refund credit of the refund address, independent of fulfillment; only that address withdraws it with withdrawRefundCredit. |
-| Unpublished request, deadline live | Fee is escrowed. Inspect saved snapshot age against the 240-second bound, demand, target resolution and keeper nonce; no alternate query or reroll. |
+| Unpublished request, deadline live | Fee is escrowed. Inspect saved snapshot age against the 240-second bound, demand, target resolution, keeper nonce and which fallback window of the epoch's catalog is open (`sourceCountAt`, `fallbackOpensAt`); no alternate query or reroll outside that ladder. |
 | Published request, deadline live | Real proof can be accepted after target confirmations, alone or inside fulfillRandomnessBatch; pending transactions are not acceptance. |
 | Batch member skipped | FulfillmentSkipped(requestId, reason): 1 already fulfilled, 2 refunded, 3 past deadline. That member is untouched; the other members settle normally. |
 | Fulfilled, callback delivered | Result is final; continue the separate application action. |
@@ -27,7 +27,7 @@ Each request settles from its own snapshots: `requestFeePaid(id)` fixes the amou
 
 Full coordinator ABI contains recovery functions omitted from ID20VRF. Separate request fees, application refunds, callback delivery, keeper credits and refund credits. After compaction, use retained IDs/hashes to retrieve original public events; raw local bodies may be gone. Unused local snapshots can be retained for 50 epochs with live-work protection.
 
-An implementation change stops the keeper until explicit review and updated pins. Preserve journal/proof/nonce data; do not treat an upgrade as permission to reroll or bypass recovery. Prepare concrete authorized recovery calls; a read-only diagnosis does not authorize gas or administration.
+An implementation change stops the keeper until explicit review and updated pins. A scheduled catalog changes only future epochs' recipes and signers; until it applies, a source whose recipe changed without its signer yields no valid packet and falls back to the next slot. Preserve journal/proof/nonce data; do not treat an upgrade as permission to reroll or bypass recovery. Prepare concrete authorized recovery calls; a read-only diagnosis does not authorize gas or administration.
 
 ## Refund notification
 
