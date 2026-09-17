@@ -3,7 +3,7 @@ name: d20-consumer
 description: Integrate d20dao randomness consumers, same-transaction fee quotes, refund credit, authenticated callbacks and deterministic mappings into an application.
 ---
 
-Public protocol reference: `5cb939a27983e037bc4173dbaa2f021bd223dfbc`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `80c6b4b3451dd497399a8d91e3035585965d9ab9`. Match installed SDK provenance and deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Install `@d20dao/vrf-sdk` 0.4.0 or newer from npm and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error. Confirm the selected chain, effective coordinator/registry proxy addresses and both implementation histories. Use public documentation and the package when source repositories require separate access.
 
