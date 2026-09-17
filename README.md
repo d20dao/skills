@@ -12,8 +12,10 @@ Use `@d20dao/vrf-sdk` 0.3.3 or newer, Node 22.13+ and Solidity 0.8.28 (EVM versi
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
-- [Methods and result semantics](skills/d20-consumer/references/methods.md): fee quoting, dice, coin, range, choose-one/many and shuffle
+- [Methods and result semantics](skills/d20-consumer/references/methods.md): fee quoting, dice, coin, range, choose-one/many and shuffle, reading results, recovery gas and front ends
 - [JavaScript examples](skills/d20-consumer/assets/mappings.mjs): mapping specs and deterministic outputs
+- [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md): every coordinator and registry function, event and error, with what to do on each error
+- [d20dao/randomizer-demo](https://github.com/d20dao/randomizer-demo): a complete dapp built from these guides, running at https://mainnet-demo.d20dao.org
 
 ## Arc Mainnet contracts
 
@@ -49,6 +51,13 @@ Each request pays `fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOver
 
 Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. These are initialization values: `pricing()` returns the live values, which the owner may change within bounds. Example with the initialization values and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
 
+## Results, recovery and front ends
+
+- Take `requestId` from the coordinator's `RandomnessRequested` log. Poll by reading the latest block and then `getRequest(requestId)`: `fulfilled` means the word is final (`getMappedResult`); not fulfilled with a block timestamp after `deadline`, 60 seconds after the request, means expired and refundable. Nothing is fulfilled late.
+- `refundRequest`, `retryCallback` and `retryRefundCallback` revert with `InsufficientCallbackGas` rather than forward less gas. Use transaction gas limits of 400,000 for `refundRequest`, `gasLimit + 250,000` for `retryCallback(id, gasLimit)` and `gasLimit + 150,000` for `retryRefundCallback(id, gasLimit)`.
+- Wallets add the network with `wallet_addEthereumChain`: chain ID `0x13b2` for Arc Mainnet or `0x4cef52` for Arc Testnet, native currency USDC with 18 decimals.
+- Observed on 2026-09-17, not guaranteed: public Arc RPC endpoints (`*.arc.io`) are blocked by common browser ad-block lists, and some reject or rate-limit large JSON-RPC batches. Read through the connected wallet's provider or a same-origin read-only relay such as the [demo worker](https://github.com/d20dao/randomizer-demo/blob/main/worker/index.js), and lower ethers' `batchMaxCount`. Details: [methods](skills/d20-consumer/references/methods.md#front-ends).
+
 ## Give this task to your agent
 
 ```text
@@ -59,8 +68,10 @@ Install @d20dao/vrf-sdk 0.3.3 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain. Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
-small authenticated callbacks, same-word retries and refunds. For choice
-or shuffle, commit to the ordered item list before requesting. Compile and
+small authenticated callbacks, same-word retries and refunds. Wait for
+fulfillment up to the request deadline, treat an unfulfilled request as
+expired, and give refund and retry calls enough gas. For choice or
+shuffle, commit to the ordered item list before requesting. Compile and
 test the integration; report changes and results. Follow my instructions
 for deployment and funded transactions.
 ```

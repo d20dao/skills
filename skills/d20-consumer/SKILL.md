@@ -5,7 +5,7 @@ description: Integrate d20dao randomness consumers, same-transaction fee quotes,
 
 Public protocol reference: `640b60cb992a7e3add1efe8e7b392341732ea004`. Match installed SDK provenance and deployed implementation history before use.
 
-Install `@d20dao/vrf-sdk` 0.3.3 or newer from npm and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. Confirm the selected chain, effective coordinator/registry proxy addresses and both implementation histories. Use public documentation and the package when source repositories require separate access.
+Install `@d20dao/vrf-sdk` 0.3.3 or newer from npm and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error. Confirm the selected chain, effective coordinator/registry proxy addresses and both implementation histories. Use public documentation and the package when source repositories require separate access.
 
 ## Integration workflow and resources
 
@@ -13,7 +13,7 @@ Inspect the existing contract's authorization, storage/initializer design and re
 
 - For Arc Mainnet (live), read [deployment addresses](references/arc-mainnet.md) and [machine-readable identities](references/arc-mainnet.json).
 - For Arc Testnet, read [deployment addresses](references/arc-testnet.md) and [machine-readable identities](references/arc-testnet.json). Configure the coordinator proxy, not an implementation or the restricted pilot consumer.
-- Read [methods and semantics](references/methods.md) for fee quoting, built-in signatures, bounds, list commitments and recovery functions.
+- Read [methods and semantics](references/methods.md) for fee quoting, built-in signatures, bounds, list commitments, reading results, recovery gas and front ends.
 - Adapt [RandomnessConsumer.sol](assets/RandomnessConsumer.sol) for a constructor-based consumer. It pays the same-transaction quote, returns change to the payer, acts as its own refund address, credits refunded fees to requesters from the refund notification and pulls coordinator refund credit. Add real eligibility rules; its public entry points do not decide who may obtain an application outcome.
 - Use [mappings.mjs](assets/mappings.mjs) for SDK mapping specs. A mapped word alone does not verify a proof.
 
@@ -26,7 +26,7 @@ For an upgradeable existing application, preserve its initializer and storage la
 - In the requesting transaction, `quoteFee(callbackGasLimit)` is exact: forward exactly that value, or let a `D20VRFRequests` helper pay it from the contract balance. Require `msg.value >= fee` and return or account for the difference.
 - Off-chain, never use `quoteFee` through `eth_call`: it commonly sees a base fee of 0 (observed on Arc) and returns only `minFee`. Quote `quoteFeeAt(callbackGasLimit, latestBlock.baseFeePerGas)`, add a buffer for base-fee movement (the SDK's `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })`) and send at least that.
 - Below the transaction's own quote the coordinator reverts with `IncorrectFee(expected, actual)`; re-quote and resend. Anything above it is credited to the refund address (`FeeOverpaymentCredited`) as refund credit, never revenue, and only that address can withdraw it with `withdrawRefundCredit(recipient)`.
-- `requestFeePaid(id)` and `requestRefundBps(id)` show what a request escrowed; keeper share, treasury share and refund settle from those snapshots, so a later pricing or ratio change never touches an open request.
+- `requestFeePaid(id)` and `requestRefundBps(id)` show what one request escrowed and the ratio it is refunded at; a later `setPricing` or `setRefundBps` never changes an open request. `refundBps()` and `pricing()` describe only future requests. The keeper/treasury split of the escrowed fee uses `keeperFeeBps()` at acceptance, which does not change what the consumer paid or can be refunded.
 
 Choose the refund address deliberately. A consumer contract that is the refund address must accept a 30,000-gas native push (`receive()`) or call `withdrawRefundCredit` to pull failed pushes and overpayment credit, as the example does. A wallet refund address withdraws its own credit directly from the coordinator.
 
@@ -40,7 +40,20 @@ After epoch activation, requests escrow their quoted fee even if publication is 
 - Mapped callbacks still return raw words. Read getMappedResult or use canonical mapping; d20 maps to 1 through 20.
 - Valid onchain acceptance at or before original requestedAt+60 seconds is timely. Callback failure still earns service payment; retryCallback redelivers only the same result. Strictly after the deadline, `refundRequest(id)` pays `feePaid × refundBps / 10000` to the fixed refund address or records it as refund credit; the ratio was snapshotted at request time (default 100%; the owner may lower it to no less than 50% for future requests only).
 
-Both contracts support owner-authorized UUPS upgrades and two-step ownership; `renounceOwnership` is disabled. Upgrade authority is trusted. The registry committer, coordinator payout recipient, keeper share, bounded pricing, refund ratio and future signer catalogs (scheduled at least two epochs ahead) are administrable; the current implementation provides no request-input or VRF-key override. Verify deployed code, implementation pins and the selected deployment rather than trusting code length or an address alone.
+## Wait for and read the result
+
+- Take `requestId` from the coordinator's `RandomnessRequested` log in the request receipt, filtered by coordinator address and event name (`FeeOverpaymentCredited` comes first when there is excess), or return it from the consumer.
+- Poll by reading the latest block first and then `getRequest(requestId)` from `coordinatorAbi`. `fulfilled` means the word is final: read `getMappedResult(requestId)` (it reverts `NotFulfilled` before) or the consumer's stored word. `delivered` only reports that the callback succeeded. Not fulfilled with a block timestamp after `deadline` (request time plus 60 seconds) means expired: nothing is fulfilled late, and `refundRequest` applies. Single requests are normally fulfilled within a few seconds, but wait up to the deadline; timings are not an SLA.
+- Recovery calls revert `InsufficientCallbackGas` instead of forwarding less gas. Transaction gas limits: `refundRequest` 400,000; `retryCallback(id, gasLimit)` `gasLimit + 250,000`; `retryRefundCallback(id, gasLimit)` `gasLimit + 150,000`. Size `callbackGasLimit` by measuring the callback (a new storage slot costs about 22,100 gas) and adding a margin.
+
+## Front ends
+
+- Add the network with `wallet_addEthereumChain` and `nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet `chainId: '0x13b2'` (5042), `rpcUrls: ['https://rpc.mainnet.arc.io']`, `blockExplorerUrls: ['https://explorer.arc.io']`; Arc Testnet `chainId: '0x4cef52'` (5042002), `rpcUrls: ['https://rpc.testnet.arc.io']`, `blockExplorerUrls: ['https://testnet.arcscan.app']`.
+- Coordinator reverts pass through the consumer's call unchanged. Decode them with `coordinatorAbi` (`coordinator.interface.parseError(data)` in ethers); the API reference gives the response to each error.
+- ethers v6 structs are `Result` arrays: a field named like an array member, such as `values` or `length`, is shadowed; use `result.getValue(name)` or `result.toObject()`.
+- Observed 2026-09-17, not guaranteed: public Arc RPC endpoints are on `*.arc.io`, which common browser ad-block lists block (`net::ERR_BLOCKED_BY_CLIENT`), and some endpoints rate-limit or reject large JSON-RPC batches. Read through the connected wallet's provider or a same-origin read-only relay, and lower ethers' `batchMaxCount`; details in [methods](references/methods.md#front-ends). [d20dao/randomizer-demo](https://github.com/d20dao/randomizer-demo) is a complete dapp with such a relay.
+
+Both contracts support owner-authorized UUPS upgrades and two-step ownership; `renounceOwnership` is disabled. Upgrade authority is trusted. The registry committer, coordinator payout recipient, keeper share, bounded pricing, refund ratio and future signer catalogs (scheduled at least two epochs ahead) are administrable; the current implementation provides no request-input or VRF-key override. Verify deployed code, implementation pins and the selected deployment rather than trusting code length or an address alone: when you integrate, and again whenever the deployment manifest records an upgrade or a proxy emits `Upgraded(implementation)`.
 
 Use the application's existing validation/payment/result flow. SDK examples do not implement PoW, claim locking or minting. Compile through the actual resolver and test changed authentication, fee and lifecycle paths. Local success does not establish service readiness.
 

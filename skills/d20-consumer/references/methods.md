@@ -44,4 +44,59 @@ The [consumer example](../assets/RandomnessConsumer.sol) records a context hash 
 
 Preserve its existing storage, roles, fee model and finalization flow. The example uses a constructor and an immutable coordinator. An upgradeable application needs its own reviewed initializer/storage or an adapter design; do not replace its initializer with the example's constructor or shift its storage layout. Authenticate callbacks, correlate known request IDs, reject duplicate settlement and keep transfers/mints in a separate application step.
 
-`refundRequest`, `retryCallback`, `retryRefundCallback`, `withdrawRefundCredit`, `requestFeePaid`, `requestRefundBps` and `pricing` are in the full `coordinatorAbi`, not the minimal `ID20VRF` interface; declare a local interface for the ones a contract calls, as the example does. A failed delivery after accepted proof is paid service: retry the same stored word. An unfulfilled request can be refunded strictly after 60 seconds for `feePaid × refundBps / 10000` (default 100%; the owner may lower the ratio to no less than 50% for future requests); the remainder is retained by the service. The refund is pushed to the fixed refund address with 30,000 gas or recorded as its refund credit. The optional `_onRefund` hook then receives only the request ID; `retryRefundCallback` repeats the notice only. No coordinator reentry from either callback.
+`refundRequest`, `retryCallback`, `retryRefundCallback`, `withdrawRefundCredit`, `getRequest`, `requestFeePaid`, `requestRefundBps` and `pricing` are in the full `coordinatorAbi`, not the minimal `ID20VRF` interface; declare a local interface for the ones a contract calls, as the example does. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) documents every coordinator function, event and error. A failed delivery after accepted proof is paid service: retry the same stored word. An unfulfilled request can be refunded strictly after 60 seconds for `feePaid × refundBps / 10000` (default 100%; the owner may lower the ratio to no less than 50% for future requests); the remainder is retained by the service. The refund is pushed to the fixed refund address with 30,000 gas or recorded as its refund credit. The optional `_onRefund` hook then receives only the request ID; `retryRefundCallback` repeats the notice only. No coordinator reentry from either callback.
+
+## Names that are easy to confuse
+
+- `refundBps()` is the coordinator's current refund ratio, copied into each new request. `requestRefundBps(id)` is the ratio one request copied at creation and is refunded at. Likewise `pricing()` and `quoteFee` price future requests, while `requestFeePaid(id)` is what one request escrowed. `keeperFeeBps()` has no per-request copy; it splits the escrowed fee at acceptance.
+- `RandomnessMapping.Spec` is the Solidity struct `(operation, lower, upper, count, population)`. The TypeScript mapping spec (`MappingSpec`) returned by `builtins` has the same fields as an object, with `lower` and `upper` as `bigint`; ethers encodes it for the struct unchanged, and `hashMapping(spec)` equals the request's `mappingHash`.
+
+## Read the result
+
+A single request is normally fulfilled within a few seconds; wait up to its deadline (request block time plus 60 seconds) and handle expiry. With ethers v6 and the [consumer example](../assets/RandomnessConsumer.sol):
+
+```js
+import { Contract } from 'ethers';
+import { builtins, quoteRequestFee } from '@d20dao/vrf-sdk';
+import { coordinatorAbi } from '@d20dao/vrf-sdk/abi';
+
+const coordinator = new Contract(coordinatorAddress, coordinatorAbi, provider);
+const { value } = await quoteRequestFee(provider, coordinatorAddress, 100_000); // CALLBACK_GAS of the example
+const receipt = await (await consumer.requestMapped(operationId, contextHash, builtins.d20(), { value })).wait();
+const requestId = receipt.logs
+  .filter((log) => log.address.toLowerCase() === coordinatorAddress.toLowerCase())
+  .map((log) => coordinator.interface.parseLog(log))
+  .find((event) => event?.name === 'RandomnessRequested').args.requestId;
+
+for (;;) {
+  // Read the block first, so a proof included up to that block is visible in getRequest.
+  const { timestamp } = await provider.getBlock('latest');
+  const request = await coordinator.getRequest(requestId);
+  if (request.fulfilled) { console.log(await coordinator.getMappedResult(requestId)); break; }
+  if (BigInt(timestamp) > request.deadline) break; // expired: refundRequest(requestId) is available
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+}
+```
+
+`fulfilled` means the word is final. `delivered` only reports the callback: a fulfilled request with `delivered` false keeps its word, and `retryCallback` delivers it again. If the keeper publishes no epoch packet or proof before the deadline, for any reason, the request expires and is never fulfilled late. Reading a word over RPC is not proof verification. Events carry the same information: `RandomnessFulfilled(requestId, randomness, submitter)`, `CallbackAttempted(requestId, success, gasLimit)` and `RequestRefundedTo(requestId, refundAddress, amount, paid)`.
+
+## Recovery gas limits
+
+`refundRequest`, `retryCallback` and `retryRefundCallback` need no value or role, but revert with `InsufficientCallbackGas` rather than forward less gas to the consumer. Measured minimum transaction gas limits and suggested values (SDK README, "Gas for refund and retry calls"):
+
+| Call | Measured minimum | Suggested gas limit |
+| --- | --- | --- |
+| `refundRequest(id)` | 302,558 to 357,517 | 400,000 |
+| `retryCallback(id, gasLimit)`, `gasLimit` 30,000–1,000,000 and at least the request's `callbackGasLimit` | about 1.032 × gasLimit + 184,300 | gasLimit + 250,000 |
+| `retryRefundCallback(id, gasLimit)`, `gasLimit` 100,000–1,000,000 | about 1.032 × gasLimit + 89,800 | gasLimit + 150,000 |
+
+`eth_estimateGas` finds these minimums because a lower limit reverts; add a margin in case state changes before inclusion.
+
+## Front ends
+
+- Bundle the ESM-only SDK (Vite, webpack, esbuild) or import only `@d20dao/vrf-sdk/abi` when you need just the ABIs.
+- Add the network with `wallet_addEthereumChain`, native currency `{ name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet chain ID `0x13b2`, RPC `https://rpc.mainnet.arc.io`, explorer `https://explorer.arc.io`; Arc Testnet chain ID `0x4cef52`, RPC `https://rpc.testnet.arc.io`, explorer `https://testnet.arcscan.app`.
+- Coordinator custom errors pass through the consumer's call. Decode revert data with `coordinator.interface.parseError(data)` or add the coordinator's error entries to the consumer ABI; `OnlyCoordinator` is in the consumer ABI only. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists each error's selector and response.
+- ethers v6 returns structs as `Result` arrays. A field named like an `Array` or `Result` member (`values`, `length`, `map`, `keys`) is shadowed; read it with `result.getValue(name)`, by position or from `result.toObject()`.
+- Observed on 2026-09-17 while deploying https://mainnet-demo.d20dao.org, not guaranteed: every public Arc RPC endpoint is on `*.arc.io`, which common browser ad-block filter lists block, so read-only calls failed with `net::ERR_BLOCKED_BY_CLIENT` for many users. Read through the connected wallet's EIP-1193 provider after checking its chain ID, or through a same-origin read-only JSON-RPC relay such as the demo's [worker/index.js](https://github.com/d20dao/randomizer-demo/blob/main/worker/index.js), which forwards only read methods.
+- Also observed on 2026-09-17: `rpc.mainnet.arc.io` rate-limited batched calls from shared Cloudflare egress addresses while `rpc.blockdaemon.mainnet.arc.io` accepted them, and the free plan of `rpc.drpc.*.arc.io` rejected batches of more than 3 calls. ethers `JsonRpcProvider` batches up to 100 calls by default; set `batchMaxCount`, for example `new JsonRpcProvider(url, 5042, { staticNetwork: true, batchMaxCount: 1 })`. Cache final values: once `fulfilled` is true, the word and mapped result never change.
