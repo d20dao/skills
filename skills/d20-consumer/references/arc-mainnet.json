@@ -1,0 +1,27 @@
+{
+  "network": "Arc Mainnet",
+  "chainId": 5042,
+  "snapshotDate": "2026-09-17",
+  "sdk": "@d20dao/vrf-sdk@0.3.1",
+  "protocolSourceCommit": "640b60cb992a7e3add1efe8e7b392341732ea004",
+  "manifest": "https://d20dao.org/deployments/arc-mainnet.json",
+  "contracts": {
+    "coordinator": {
+      "proxy": "0xd20da057469C45928912d983F45790C41e290571",
+      "implementation": "0xD20da0c375cEfCdA65703699A4090237057e9b68",
+      "implementationCodeHash": "0x39360c272bc4806b66b6f3928f6f5f2bff240d186aba0e09cbbdc574c3c1622f"
+    },
+    "epochRegistry": {
+      "proxy": "0xd20Da048C1A68fa3Bc0B5f5Bc454D1530062C82D",
+      "implementation": "0xD20Da0cf7Ddc6123f9A87c0C210F8ECB934CA7D5",
+      "implementationCodeHash": "0xeb8c6ff3a703f40153d67729112228e6a02bd9745680ca8afeedf99bd1a40a09"
+    },
+    "costClient": {
+      "proxy": "0xD20da0048aED2BBb9f0e7078Bc452815D626D29d",
+      "implementation": "0xD20DA00A872acfDe3e4721Fc1051BD23CC84B66b",
+      "implementationCodeHash": "0xb30bd76592fc6def770bf8599a4dcfa827ce4fe1e951000d462c74d488b53e91"
+    }
+  },
+  "owner": "0xB57f656149749eff6b496dF090336491f977E744",
+  "consumerAccess": "public"
+}

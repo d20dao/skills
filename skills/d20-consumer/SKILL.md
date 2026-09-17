@@ -11,6 +11,7 @@ Install `@d20dao/vrf-sdk` 0.3.0 or newer from npm and read its packaged README, 
 
 Inspect the existing contract's authorization, storage/initializer design and request settlement first. Select raw randomness or the intended mapping; preserve application payment and eligibility rules. Do not introduce a keeper deployment into an application integration task.
 
+- For Arc Mainnet (live), read [deployment addresses](references/arc-mainnet.md) and [machine-readable identities](references/arc-mainnet.json).
 - For Arc Testnet, read [deployment addresses](references/arc-testnet.md) and [machine-readable identities](references/arc-testnet.json). Configure the coordinator proxy, not an implementation or the restricted pilot consumer.
 - Read [methods and semantics](references/methods.md) for fee quoting, built-in signatures, bounds, list commitments and recovery functions.
 - Adapt [RandomnessConsumer.sol](assets/RandomnessConsumer.sol) for a constructor-based consumer. It pays the same-transaction quote, returns change to the payer, acts as its own refund address, credits refunded fees to requesters from the refund notification and pulls coordinator refund credit. Add real eligibility rules; its public entry points do not decide who may obtain an application outcome.

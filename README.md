@@ -15,9 +15,21 @@ Use `@d20dao/vrf-sdk` 0.3.0 or newer, Node 22.13+ and Solidity 0.8.28. Copy the 
 - [Methods and result semantics](skills/d20-consumer/references/methods.md): fee quoting, dice, coin, range, choose-one/many and shuffle
 - [JavaScript examples](skills/d20-consumer/assets/mappings.mjs): mapping specs and deterministic outputs
 
+## Arc Mainnet contracts
+
+Chain ID **5042** (live service). Connect applications to the **coordinator proxy**.
+
+| Contract | Proxy address |
+| --- | --- |
+| D20VRFCoordinator | `0xd20da057469C45928912d983F45790C41e290571` |
+| EpochEntropy | `0xd20Da048C1A68fa3Bc0B5f5Bc454D1530062C82D` |
+| Restricted cost client | `0xD20da0048aED2BBb9f0e7078Bc452815D626D29d` |
+
+The [mainnet deployment reference](skills/d20-consumer/references/arc-mainnet.md) includes implementation addresses and runtime hashes.
+
 ## Arc Testnet contracts
 
-Chain ID **5042002**. Connect applications to the **coordinator proxy**.
+Chain ID **5042002** (development). Connect applications to the **coordinator proxy**.
 
 | Contract | Proxy address |
 | --- | --- |
