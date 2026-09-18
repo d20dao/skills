@@ -5,6 +5,7 @@ These skills support readers and assistants using the public d20dao randomness s
 The main task is adding randomness to an existing application contract. Begin with [d20-consumer](skills/d20-consumer/SKILL.md), its [deployment reference](skills/d20-consumer/references/arc-mainnet.md), [method table](skills/d20-consumer/references/methods.md) and [consumer example](skills/d20-consumer/assets/RandomnessConsumer.sol). Preserve the application's existing authorization, storage, initialization and payment rules; the constructor-based example is not a drop-in initializer for an upgradeable application.
 
 - **d20-consumer** — D20VRFConsumer/ID20VRF integration, fee quoting, refund credit, callback authentication and deterministic mappings.
+- **d20-agent-api** — buying results over HTTP with x402 (0.05 USDC per call through Circle Gateway) when the user needs randomness, not a contract integration.
 - **d20-lifecycle** — pending publication, timely acceptance, batch fulfillment events, same-result callback retry and fixed-recipient refunds.
 - **d20-verification** — trusted proxy, epoch and request evidence, per-epoch recipe catalogs and public replay.
 - **d20-sdk** — package exports, ABIs, Solidity imports and off-chain fee quoting.

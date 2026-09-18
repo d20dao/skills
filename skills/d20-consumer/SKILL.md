@@ -7,6 +7,8 @@ Public protocol reference: `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`. Match the
 
 Install `@d20dao/vrf-sdk` 0.4.0 or newer and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error.
 
+For agents that pay per call over HTTP, see **d20-agent-api**.
+
 ## Integration workflow
 
 Inspect the existing contract's authorization, storage/initializer design and settlement first. Select raw randomness or the intended mapping, and preserve application payment and eligibility rules. Do not introduce a keeper deployment into an application integration task.

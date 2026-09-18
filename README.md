@@ -1,6 +1,6 @@
 # D20DAO integration skills
 
-Help coding agents add verifiable randomness to existing application contracts with `@d20dao/vrf-sdk`. Start with **d20-consumer** for authenticated callbacks, same-transaction fee quotes, refund credit and raw or mapped results. No keeper setup is required to integrate an application, and no registration or allowlist is required to request service.
+Help coding agents add verifiable randomness to existing application contracts with `@d20dao/vrf-sdk`. Start with **d20-consumer** for authenticated callbacks, same-transaction fee quotes, refund credit and raw or mapped results. No keeper setup is required to integrate an application, and no registration or allowlist is required to request service. An agent that needs results rather than a contract integration can buy them over HTTP with **d20-agent-api**: 0.05 USDC per call over x402.
 
 ## Quick start
 
@@ -73,6 +73,7 @@ for deployment and funded transactions.
 | Skill | Use |
 | --- | --- |
 | d20-consumer | Integrate authenticated consumers, fee quoting and deterministic mappings |
+| d20-agent-api | Buy results over HTTP with x402, 0.05 USDC per call, without a contract |
 | d20-lifecycle | Diagnose publication, acceptance, callbacks, refunds and refund credit |
 | d20-verification | Replay public epoch/VRF evidence with trusted context |
 | d20-sdk | Install and use the published SDK |
