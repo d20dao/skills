@@ -26,13 +26,15 @@ One word is 256 bits, so one request covers an operation that needs several valu
 
 Off-chain quoting example (ethers v6): read `baseFeePerGas` from the latest block, call `quoteFeeAt(callbackGasLimit, baseFeePerGas)`, then send the quote recomputed at a buffered base fee. The SDK's `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` returns both the exact quote for that header (`fee`) and the buffered amount to send (`value`). Do not call `quoteFee` through `eth_call`: it commonly reports a base fee of 0 and returns only `minFee`.
 
-Labelled example with the initialization values of both Arc deployments (0.08 USDC minimum fee, multiplier 5, overhead 300,000 gas; `pricing()` returns the live values, which the owner may change within bounds) and `callbackGasLimit` 100,000:
+Labelled example with the initialization values, which Arc Testnet still uses (0.08 USDC minimum fee, multiplier 5, overhead 300,000 gas; `pricing()` returns the live values, which the owner may change within bounds) and `callbackGasLimit` 100,000:
 
 | Header base fee | 5 × baseFee × 400,000 | Fee paid |
 | --- | --- | --- |
 | 20 gwei | 0.04 USDC | 0.08 USDC (minimum applies) |
 | 200 gwei | 0.40 USDC | 0.40 USDC |
 | 200 gwei quoted with a 30% buffer (260 gwei) | 0.52 USDC sent | 0.40 USDC paid; 0.12 USDC credited to the refund address |
+
+Since 2026-09-18 Arc Mainnet charges a 0.02 USDC minimum fee, multiplier 3 and overhead 300,000 gas. At a 20 gwei base fee and `callbackGasLimit` 100,000 it charges 3 × 20 gwei × 400,000 = 0.024 USDC.
 
 Payment below the transaction's quote reverts with `IncorrectFee(expected, actual)` and creates no request. Excess is credited to the refund address (`FeeOverpaymentCredited(requestId, refundAddress, amount)`) and withdrawn by that address with `withdrawRefundCredit(recipient)`; the coordinator never keeps it. `RandomnessRequested` carries `feePaid`; `requestFeePaid(id)` and `requestRefundBps(id)` return the escrowed fee and the refund ratio snapshotted for that request.
 

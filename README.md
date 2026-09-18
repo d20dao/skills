@@ -37,7 +37,7 @@ Each request pays `fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOver
 - An off-chain sender quotes `quoteFeeAt(callbackGasLimit, latestBlock.baseFeePerGas)` plus a buffer for base-fee movement, because `eth_call` commonly reports a base fee of 0 and `quoteFee` then returns only `minFee`. The SDK helper `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` does this.
 - `msg.value` below the transaction's own quote reverts with `IncorrectFee(expected, actual)`. Any excess is credited to the refund address (`FeeOverpaymentCredited`) and is withdrawable by that address with `withdrawRefundCredit(recipient)`; it is never revenue, and nobody sweeps it for you.
 
-Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. Those are initialization values; `pricing()` returns the live ones. With them and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
+Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. Arc Testnet still uses them. Since 2026-09-18 Arc Mainnet charges a 0.02 USDC minimum fee, multiplier 3 and overhead 300,000 gas. `pricing()` returns the live values. With `callbackGasLimit` 100,000 and a 20 gwei base fee, Arc Mainnet charges 3 × 20 gwei × 400,000 = 0.024 USDC. At the testnet values the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
 
 ## Results and recovery
 
