@@ -1,6 +1,7 @@
 import { builtins, mapRandomness, hashMapping } from '@d20dao/vrf-sdk';
 
-export const recipes = {
+// Mapping specs, not epoch source recipes: these say how one accepted word becomes application values.
+export const mappings = {
   raw: builtins.raw(),
   d20: builtins.d20(),
   fourDice: builtins.diceRoll(6n, 4),

@@ -1,6 +1,6 @@
 # D20DAO integration skills
 
-Help coding agents add verifiable randomness to existing application contracts with `@d20dao/vrf-sdk`. Start with **d20-consumer** for authenticated callbacks, same-transaction fee quotes, refund credit and raw or mapped results. No keeper setup is required to integrate an application.
+Help coding agents add verifiable randomness to existing application contracts with `@d20dao/vrf-sdk`. Start with **d20-consumer** for authenticated callbacks, same-transaction fee quotes, refund credit and raw or mapped results. No keeper setup is required to integrate an application, and no registration or allowlist is required to request service.
 
 ## Quick start
 
@@ -8,55 +8,47 @@ Help coding agents add verifiable randomness to existing application contracts w
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.4.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's supported skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.4.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
 - [Methods and result semantics](skills/d20-consumer/references/methods.md): fee quoting, dice, coin, range, choose-one/many and shuffle, reading results, recovery gas and front ends
 - [JavaScript examples](skills/d20-consumer/assets/mappings.mjs): mapping specs and deterministic outputs
 - [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md): every coordinator and registry function, event and error, with what to do on each error
-- [d20dao/randomizer-demo](https://github.com/d20dao/randomizer-demo): a complete dapp built from these guides, running at https://mainnet-demo.d20dao.org
+- [d20dao/randomizer-demo](https://github.com/d20dao/randomizer-demo): a complete dapp built from these guides
 
-## Arc Mainnet contracts
+## Contracts
 
-Chain ID **5042** (live service). Connect applications to the **coordinator proxy**.
+Connect applications to the **coordinator proxy**. Proxy addresses are stable across upgrades; implementation addresses and runtime hashes are in the deployment references.
 
-| Contract | Proxy address |
-| --- | --- |
-| D20VRFCoordinator | `0xd20da057469C45928912d983F45790C41e290571` |
-| EpochEntropy | `0xd20Da048C1A68fa3Bc0B5f5Bc454D1530062C82D` |
-| Restricted cost client | `0xD20da0048aED2BBb9f0e7078Bc452815D626D29d` |
+| Contract | Arc Mainnet — chain 5042 (live) | Arc Testnet — chain 5042002 (development) |
+| --- | --- | --- |
+| D20VRFCoordinator | `0xd20da057469C45928912d983F45790C41e290571` | `0xd20DA0FF9087d053f0291524Eac12abA1ADBd945` |
+| EpochEntropy | `0xd20Da048C1A68fa3Bc0B5f5Bc454D1530062C82D` | `0xD20Da00B47A7cD2211dC4683E306913b05903756` |
+| Restricted cost client | `0xD20da0048aED2BBb9f0e7078Bc452815D626D29d` | `0xD20da026090B8472579a2B93030F1fC4c94807F1` |
 
-The [mainnet deployment reference](skills/d20-consumer/references/arc-mainnet.md) includes implementation addresses and runtime hashes.
-
-## Arc Testnet contracts
-
-Chain ID **5042002** (development). Connect applications to the **coordinator proxy**.
-
-| Contract | Proxy address |
-| --- | --- |
-| D20VRFCoordinator | `0xd20DA0FF9087d053f0291524Eac12abA1ADBd945` |
-| EpochEntropy | `0xD20Da00B47A7cD2211dC4683E306913b05903756` |
-| Restricted cost client | `0xD20da026090B8472579a2B93030F1fC4c94807F1` |
-
-The [deployment reference](skills/d20-consumer/references/arc-testnet.md) includes implementation addresses and runtime hashes. Snapshot: 16 September 2026. Use the [current public manifest](https://d20dao.org/deployments/arc-testnet.json) for the selected deployment. The cost client is restricted test tooling, not a shared endpoint for applications.
+Deployment references, snapshot 18 September 2026: [Arc Mainnet](skills/d20-consumer/references/arc-mainnet.md), [Arc Testnet](skills/d20-consumer/references/arc-testnet.md). Both chains run the same upgraded implementations, which added the on-chain recipe registry and pay each request's keeper share to the authorized wallet that submitted its proof; the consumer ABI did not change. The current public manifests are [arc-mainnet.json](https://d20dao.org/deployments/arc-mainnet.json) and [arc-testnet.json](https://d20dao.org/deployments/arc-testnet.json). The cost client is restricted test tooling, not a shared endpoint for applications.
 
 ## Fees
 
-Each request pays `fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))` in native USDC (18 decimals); `pricing()` returns the live `(minFee, feeMultiplier, fulfillGasOverhead)`, which the owner can change within fixed bounds (`PricingChanged`). Transaction gas is separate. No consumer registration or allowlisting is needed.
+Each request pays `fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))` in native USDC (18 decimals); `pricing()` returns the live `(minFee, feeMultiplier, fulfillGasOverhead)`, which the owner can change within fixed bounds (`PricingChanged`). Transaction gas is separate.
 
-- A contract pays `quoteFee(callbackGasLimit)` in the requesting transaction; that quote is exact.
+- A contract pays `quoteFee(callbackGasLimit)` in the requesting transaction; that quote is exact. Requests must come from a contract, not a wallet.
 - An off-chain sender quotes `quoteFeeAt(callbackGasLimit, latestBlock.baseFeePerGas)` plus a buffer for base-fee movement, because `eth_call` commonly reports a base fee of 0 and `quoteFee` then returns only `minFee`. The SDK helper `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` does this.
-- `msg.value` below the transaction's own quote reverts with `IncorrectFee(expected, actual)`. Any excess is credited to the refund address as refund credit (`FeeOverpaymentCredited`), withdrawable by that address with `withdrawRefundCredit(recipient)`; it is never revenue.
+- `msg.value` below the transaction's own quote reverts with `IncorrectFee(expected, actual)`. Any excess is credited to the refund address (`FeeOverpaymentCredited`) and is withdrawable by that address with `withdrawRefundCredit(recipient)`; it is never revenue, and nobody sweeps it for you.
 
-Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. These are initialization values: `pricing()` returns the live values, which the owner may change within bounds. Example with the initialization values and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
+Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5 and overhead 300,000 gas. Those are initialization values; `pricing()` returns the live ones. With them and `callbackGasLimit` 100,000: at a 20 gwei base fee the dynamic part is 5 × 20 gwei × 400,000 = 0.04 USDC, so the request pays the 0.08 minimum; at 200 gwei it pays 0.4 USDC.
 
-## Results, recovery and front ends
+## Results and recovery
 
-- Take `requestId` from the coordinator's `RandomnessRequested` log. Poll by reading the latest block and then `getRequest(requestId)`: `fulfilled` means the word is final (`getMappedResult`); not fulfilled with a block timestamp after `deadline`, 60 seconds after the request, means expired and refundable. Nothing is fulfilled late.
+- Take `requestId` from the coordinator's `RandomnessRequested` log. Poll by reading the latest block and then `getRequest(requestId)`: `fulfilled` means the word is final (`getMappedResult`); not fulfilled with a block timestamp after `deadline`, 60 seconds after the request, means expired and refundable. Nothing is fulfilled late, and a served request is never rerolled — `retryCallback` redelivers the same word.
+- A single request is normally fulfilled within a few seconds. Measured timings are not an SLA: wait up to the deadline and handle expiry.
 - `refundRequest`, `retryCallback` and `retryRefundCallback` revert with `InsufficientCallbackGas` rather than forward less gas. Use transaction gas limits of 400,000 for `refundRequest`, `gasLimit + 250,000` for `retryCallback(id, gasLimit)` and `gasLimit + 150,000` for `retryRefundCallback(id, gasLimit)`.
-- Wallets add the network with `wallet_addEthereumChain`: chain ID `0x13b2` for Arc Mainnet or `0x4cef52` for Arc Testnet, native currency USDC with 18 decimals.
-- Observed on 2026-09-17, not guaranteed: public Arc RPC endpoints (`*.arc.io`) are blocked by common browser ad-block lists, and some reject or rate-limit large JSON-RPC batches. Read through the connected wallet's provider or a same-origin read-only relay such as the [demo worker](https://github.com/d20dao/randomizer-demo/blob/main/worker/index.js), and lower ethers' `batchMaxCount`. Details: [methods](skills/d20-consumer/references/methods.md#front-ends).
+- Front ends add the network with `wallet_addEthereumChain`: chain ID `0x13b2` for Arc Mainnet or `0x4cef52` for Arc Testnet, native currency USDC with 18 decimals. Public Arc RPC endpoints are blocked by common browser ad-block lists, and some reject large JSON-RPC batches: read through the connected wallet's provider or a same-origin read-only relay, and lower ethers' `batchMaxCount`. Details: [methods](skills/d20-consumer/references/methods.md#front-ends).
+
+## Epoch sources
+
+The epoch source catalog is an on-chain, owner-managed recipe registry. Five sources are active on both chains — Hyperliquid BTC day volume, dRPC Ethereum block hash, TickerLayer BTCUSD, Nodary ETH/USD and dRPC Base block hash — in force on Arc Testnet and from epoch 848 on Arc Mainnet. Recipes are append-only and never edited, so an older epoch always replays with the recipe it used. Adding a source is an owner transaction, not a contract upgrade, and applications see no API change.
 
 ## Give this task to your agent
 
@@ -84,29 +76,19 @@ for deployment and funded transactions.
 | d20-lifecycle | Diagnose publication, acceptance, callbacks, refunds and refund credit |
 | d20-verification | Replay public epoch/VRF evidence with trusted context |
 | d20-sdk | Install and use the published SDK |
-| d20-keeper | Advanced: authorized operation of your own keeper |
+| d20-keeper | Advanced: protocol rules for operating your own keeper |
 
-Copy the required folder into the agent skill directory. Each supports explicit invocation and normal automatic discovery. Canonical public sources are the [SDK](https://github.com/d20dao/d20-sdk) and its [protocol/](https://github.com/d20dao/d20-sdk/tree/main/protocol) folder, which holds the protocol contracts and replay code copied from the commit named in its `PROTOCOL-PROVENANCE.json`.
+Each skill supports explicit invocation and normal automatic discovery. Canonical public sources are the [SDK](https://github.com/d20dao/d20-sdk) and its [protocol/](https://github.com/d20dao/d20-sdk/tree/main/protocol) folder, which holds the protocol contracts and replay code copied from the commit named in its `PROTOCOL-PROVENANCE.json`. Installing a skill authorizes no spending, deployment or publishing; signer and operator data are outside these guides.
 
-The keeper prepares 200-block epoch snapshots locally. Idle snapshots cause no publication transaction and can remain for 50 epochs. Live paid demand triggers publication, then randomness binds a canonical future block. Requests retain their original 60-second deadline and fixed refund address. The coordinator fulfills up to 16 requests per transaction with unchanged per-request events.
+Both service contracts use initialized UUPS proxies with two-step ownership; `renounceOwnership` is disabled and upgrade authority is a trust assumption. Verify both implementation histories and runtime pins when you integrate, and again whenever a manifest records an upgrade. Upgrades keep the consumer ABI compatible and keep open requests serviceable.
 
-Both service contracts use initialized UUPS proxies with two-step ownership; `renounceOwnership` is disabled. Upgrade authority is trusted; verify both implementation histories and runtime pins. Telegram is opt-in and configured-chat-only, with read-only status/keeper commands. Docker install requires reviewed configuration and separately supplied keys.
-
-Match the installed SDK provenance and deployed implementation history before use. Install the SDK with `npm install @d20dao/vrf-sdk`. Installing a skill does not authorize spending, deployment, bot access or publishing. Use only public interface information; signer, bot and operator data are outside these guides.
-
-These guides follow public protocol commit `e1dc473d87db69b916d9f6919a62d8ea8ee24487`. Match the installed SDK PROTOCOL-PROVENANCE.json to the deployment and its implementation history; each manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release. Operator backend changes do not by themselves alter this public protocol pin.
-
-## Arc Testnet pilot
-
-A public testnet service is deployed on chain 5042002. Obtain current proxy addresses and independently checked code hashes from the [Arc Testnet deployment manifest](https://d20dao.org/deployments/arc-testnet.json) (Arc Mainnet: [arc-mainnet.json](https://d20dao.org/deployments/arc-mainnet.json)). Any consumer contract can request service by paying its quoted fee; no allowlist is required. A request must be served within 60 seconds or it becomes refundable. A single request is normally fulfilled within a few seconds; in a stress test 200 simultaneous requests were delivered within 36 seconds (median 19 seconds), and an Arc Testnet run on 2026-09-16 served 68 paid requests within 2–4 chain seconds, 47 of them in batched fulfillments. Measured timings are not an SLA.
+These guides follow public protocol commit `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`, the source the live implementations were deployed from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
 
 ## Getting started with an agent
 
-Start with the [Getting started](https://d20dao.org/docs/getting-started) guide on the d20dao.org website and its Copy prompt action. `https://d20dao.org/llms.txt` indexes the public guides; `https://d20dao.org/llms-full.txt` contains complete text; `https://d20dao.org/agents.md` and `https://d20dao.org/AGENTS.md` provide integration instructions. Each guide exposes `https://d20dao.org/prompts/<guide-slug>.txt`. Use `d20-consumer` for an application, then `d20-lifecycle` and `d20-verification` for settlement and evidence.
+Start with the [Getting started](https://d20dao.org/docs/getting-started) guide and its Copy prompt action. `https://d20dao.org/llms.txt` indexes the public guides, `https://d20dao.org/llms-full.txt` holds the complete text, `https://d20dao.org/agents.md` gives integration instructions, and each guide exposes `https://d20dao.org/prompts/<guide-slug>.txt`. Use `d20-consumer` for an application, then `d20-lifecycle` and `d20-verification` for settlement and evidence. Other public entry points: [SDK on npm](https://www.npmjs.com/package/@d20dao/vrf-sdk) and the [Explorer](https://d20dao.org/explorer).
 
-Public entry points: [Getting started](https://d20dao.org/docs/getting-started), [SDK on npm](https://www.npmjs.com/package/@d20dao/vrf-sdk), [agent guide](https://d20dao.org/agents.md), [full text docs](https://d20dao.org/llms-full.txt) and [Explorer](https://d20dao.org/explorer).
-
-The included consumer is constructor-based. For upgradeable applications, retain the existing initializer and storage layout and adapt callback authentication deliberately. Choice/shuffle outputs are indices into the original committed list. Application eligibility, assets and settlement belong to the application.
+The included consumer is constructor-based. For upgradeable applications, retain the existing initializer and storage layout and adapt callback authentication deliberately. Choice and shuffle outputs are indices into the original committed list. Application eligibility, assets and settlement belong to the application.
 
 ## Validate the examples
 
@@ -115,4 +97,4 @@ npm ci
 npm run check
 ```
 
-This compiles the consumer against the installed SDK, checks that every coordinator function the template declares exists in `coordinatorAbi`, and validates the mapping examples and deployment provenance. It sends no chain transaction and needs no operator credentials.
+This compiles the consumer against the installed SDK, checks that every coordinator function the template declares exists in `coordinatorAbi`, and validates the mapping examples and both deployment snapshots. It sends no chain transaction and needs no operator credentials.
