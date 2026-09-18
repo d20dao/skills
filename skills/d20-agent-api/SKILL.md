@@ -151,6 +151,6 @@ Read the coordinator with `coordinatorAbi` from `@d20dao/vrf-sdk/abi` through `h
 
 ## References
 
-- Live OpenAPI: `https://api.d20dao.org/openapi.json` and `https://api-testnet.d20dao.org/openapi.json`; `info.x-guidance` is a plain-text brief for agents.
+- Live OpenAPI: `https://api.d20dao.org/openapi.json` (mirrored at `https://d20dao.org/openapi.json`) and `https://api-testnet.d20dao.org/openapi.json`; `info.x-guidance` is a plain-text brief for agents. Docs: `https://d20dao.org/docs/agents`.
 - [Operations, fields and status codes](references/operations.md), from the live OpenAPI.
 - **d20-consumer** when the word must reach your own contract, **d20-verification** for proof replay, **d20-lifecycle** for on-chain request states and **d20-sdk** for the package.
