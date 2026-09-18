@@ -1,6 +1,6 @@
 ---
 name: d20-sdk
-description: Install and use the published @d20dao/vrf-sdk: exports, ABIs, Solidity imports, off-chain fee quoting, mapping and replay helpers.
+description: "Install and use the published @d20dao/vrf-sdk: exports, ABIs, Solidity imports, off-chain fee quoting, mapping and replay helpers."
 ---
 
 Public protocol reference: `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.

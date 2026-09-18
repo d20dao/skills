@@ -1,6 +1,6 @@
 ---
 name: d20-keeper
-description: Protocol rules for operating a d20dao keeper: epoch source selection and fallback, publication timing, implementation pins, backup committers and the keeper share.
+description: "Protocol rules for operating a d20dao keeper: epoch source selection and fallback, publication timing, implementation pins, backup committers and the keeper share."
 ---
 
 Public protocol reference: `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
