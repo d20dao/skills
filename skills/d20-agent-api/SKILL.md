@@ -3,7 +3,7 @@ name: d20-agent-api
 description: Buy d20dao verifiable randomness over HTTP with x402, 0.05 USDC per call through Circle Gateway; operations, the 402 handshake, pending results, errors, seeds and verification.
 ---
 
-Public protocol reference: `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `98e537fb249dd0d3365b8d78e6040a9323a65a88`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Use this when an agent or backend needs verifiable randomness and can pay over HTTP, instead of deploying a consumer contract. Each paid call opens one request on the D20DAO coordinator through the API's relay contract and returns the proven result. When the word must reach your own contract, use **d20-consumer**. Installing this skill authorizes no spending: follow the user's instructions for funding and for mainnet.
 
@@ -139,7 +139,7 @@ A fulfilled answer carries `requestId`, `result`, `randomness`, `clientSeed`, `p
 1. Recompute `paymentId = keccak256(abi.encode(uint256 chainId, address payer, bytes32 nonce))` from the authorization you signed, with the payment network's chain id.
 2. `clientSeed` is `keccak256(abi.encode(bytes32 paymentId, string seed))`; on a replacement request (`replaces` is set) it is `keccak256(abi.encode(bytes32 ref, uint256 1))`. It equals `getRequest(requestId).clientSeed` on the coordinator proxy, whose `consumer` is the relay and whose `randomness` is `randomness`.
 3. `getMappedResult(requestId)` equals `result`. Offline, `mapRandomness(randomness, spec)` from `@d20dao/vrf-sdk` reproduces it, where `spec` is `mapping` with `lower` and `upper` as bigint; `hashMapping(spec)` equals `getRequest(requestId).mappingHash`.
-4. Replay the proof with `replayCoordinator` as in **d20-verification**. Reading a word over RPC is not proof verification.
+4. Replay the proof with `replayCoordinator` from `@d20dao/vrf-sdk` 0.5.0 or later, as in **d20-verification**. Reading a word over RPC is not proof verification.
 
 Read the coordinator with `coordinatorAbi` from `@d20dao/vrf-sdk/abi` through `https://rpc.mainnet.arc.io` or `https://rpc.testnet.arc.io`.
 

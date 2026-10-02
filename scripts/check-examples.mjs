@@ -52,11 +52,15 @@ const snapshots=[['arc-mainnet.json',5042],['arc-testnet.json',5042002]].map(([f
     assert(codeHash.test(c.implementationCodeHash),`${file} ${name} implementation code hash`);
     if(c.previousImplementation!==undefined)assert(address.test(c.previousImplementation),`${file} ${name} previous implementation`);
   }
+  // The beacon verifier is stateless and has no proxy, so it is listed apart from the proxied contracts.
+  assert(address.test(snapshot.beaconVerifier?.address),`${file} beacon verifier address`);
+  assert(codeHash.test(snapshot.beaconVerifier?.codeHash),`${file} beacon verifier code hash`);
   return {file,snapshot};
 });
 const [mainnet,testnet]=snapshots.map(s=>s.snapshot);
 for(const name of ['coordinator','epochRegistry','costClient'])
   assert.equal(mainnet.contracts[name].implementation,testnet.contracts[name].implementation,`${name} implementation differs between chains`);
+assert.deepEqual(mainnet.beaconVerifier,testnet.beaconVerifier,'beacon verifier differs between chains');
 const pinned=snapshots.filter(({snapshot})=>snapshot.sdk===`@d20dao/vrf-sdk@${installedVersion}`);
 for(const {file,snapshot} of pinned)assert.equal(snapshot.protocolSourceCommit,provenance,file);
 const provenanceNote=pinned.length===snapshots.length

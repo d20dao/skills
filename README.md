@@ -8,7 +8,7 @@ Help coding agents add verifiable randomness to existing application contracts w
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.4.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.5.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
@@ -27,7 +27,7 @@ Connect applications to the **coordinator proxy**. Proxy addresses are stable ac
 | EpochEntropy | `0xd20Da048C1A68fa3Bc0B5f5Bc454D1530062C82D` | `0xD20Da00B47A7cD2211dC4683E306913b05903756` |
 | Restricted cost client | `0xD20da0048aED2BBb9f0e7078Bc452815D626D29d` | `0xD20da026090B8472579a2B93030F1fC4c94807F1` |
 
-Deployment references, snapshot 22 September 2026: [Arc Mainnet](skills/d20-consumer/references/arc-mainnet.md), [Arc Testnet](skills/d20-consumer/references/arc-testnet.md). Both chains run the same upgraded implementations, which added the on-chain recipe registry, pay each request's keeper share to the authorized wallet that submitted its proof and budget every batch member's callback gas before serving a batch; the consumer ABI did not change. The current public manifests are [arc-mainnet.json](https://d20dao.org/deployments/arc-mainnet.json) and [arc-testnet.json](https://d20dao.org/deployments/arc-testnet.json). The cost client is restricted test tooling, not a shared endpoint for applications.
+Deployment references, snapshot 2 October 2026: [Arc Mainnet](skills/d20-consumer/references/arc-mainnet.md), [Arc Testnet](skills/d20-consumer/references/arc-testnet.md). Both chains run the same upgraded implementations, which added the on-chain recipe registry, drand beacon recipes checked by a stateless beacon verifier, pay each request's keeper share to the authorized wallet that submitted its proof and budget every batch member's callback gas before serving a batch; the consumer ABI did not change. The current public manifests are [arc-mainnet.json](https://d20dao.org/deployments/arc-mainnet.json) and [arc-testnet.json](https://d20dao.org/deployments/arc-testnet.json). The cost client is restricted test tooling, not a shared endpoint for applications.
 
 ## Fees
 
@@ -48,7 +48,7 @@ Both Arc deployments were initialized with a 0.08 USDC minimum fee, multiplier 5
 
 ## Epoch sources
 
-The epoch source catalog is an on-chain, owner-managed recipe registry. Five sources are active on both chains — Hyperliquid BTC day volume, dRPC Ethereum block hash, TickerLayer BTCUSD, Nodary ETH/USD and dRPC Base block hash — in force on Arc Testnet and from epoch 848 on Arc Mainnet. Recipes are append-only and never edited, so an older epoch always replays with the recipe it used. Adding a source is an owner transaction, not a contract upgrade, and applications see no API change.
+The epoch source catalog is an on-chain, owner-managed recipe registry. Since epoch 11319 on Arc Testnet and epoch 12448 on Arc Mainnet, every epoch commits one round of the drand evmnet beacon, which a stateless on-chain verifier checks; the catalog is that beacon alone, so there is no fallback source. Epochs before those came from signed API records, and SDK replay still verifies them. Replaying a beacon epoch needs `@d20dao/vrf-sdk` 0.5.0 or later: 0.4.0 rejects its 64-byte signature. Recipes are append-only and never edited, so an older epoch always replays with the recipe it used. A new recipe or catalog is an owner transaction, and applications see no API change.
 
 ## Give this task to your agent
 
@@ -56,7 +56,7 @@ The epoch source catalog is an on-chain, owner-managed recipe registry. Five sou
 Use the d20-consumer skill from https://github.com/d20dao/skills to add
 D20DAO randomness to my existing contract. Inspect its architecture and
 preserve authorization, storage, initialization and application payments.
-Install @d20dao/vrf-sdk 0.4.0 or newer, read its AGENTS.md and provenance,
+Install @d20dao/vrf-sdk 0.5.0 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain. Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
@@ -83,7 +83,7 @@ Each skill supports explicit invocation and normal automatic discovery. Canonica
 
 Both service contracts use initialized UUPS proxies with two-step ownership; `renounceOwnership` is disabled and upgrade authority is a trust assumption. Verify both implementation histories and runtime pins when you integrate, and again whenever a manifest records an upgrade. Upgrades keep the consumer ABI compatible and keep open requests serviceable.
 
-These guides follow public protocol commit `de5f82eb9fc749c80e83270f57cde9908ddcf1f3`, the protocol source of `@d20dao/vrf-sdk@0.4.0`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
+These guides follow public protocol commit `98e537fb249dd0d3365b8d78e6040a9323a65a88`, the protocol source of `@d20dao/vrf-sdk@0.5.0`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
 
 ## Getting started with an agent
 
