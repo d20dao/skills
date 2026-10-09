@@ -65,7 +65,7 @@ When a request is made, the contract binds it to a future round of drand's evmne
 
 **Delivery and refunds.** A typical delivery takes 5–8 seconds. If a request is not fulfilled within 60 seconds, its fee can be refunded to the request's refund address. As with any randomness service, design applications so that a party cannot cancel a request and retry for a better outcome.
 
-**Upgrades.** The coordinator is upgradeable (UUPS). On mainnet the owner is currently the deployer account and is moving to a 2-of-2 Safe; the testnet stays with the deployer account. Beacon changes are scheduled on chain at least 10 minutes ahead.
+**Upgrades.** The coordinator is upgradeable (UUPS) by its owner; read `owner()` from the chain. Beacon changes are scheduled on chain at least 10 minutes ahead.
 
 The coordinator implements `ID20VRF` like Arc's, so consumers and these skills' example work unchanged; differences (ETH fees, `getRoundRequest`, round events, recovery gas) are in the [deployment reference](skills/d20-consumer/references/robinhood.md). Replay a Robinhood request with `@d20dao/vrf-sdk/round` (see **d20-verification**). The x402 agent API is not available on Robinhood Chain.
 
