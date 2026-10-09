@@ -19,6 +19,6 @@ Runtime hashes and machine-readable values are in [arc-testnet.json](arc-testnet
 
 Read `pricing()` and `keeperFeeBps()` at the coordinator; native test USDC uses 18 decimals. Any consumer contract can request service by paying its quoted fee (see [methods](methods.md)); no allowlist is required. Deployment and funding of your own application follow the user's instructions.
 
-Contract source commits recorded by the manifest: coordinator `f38aaf81c9dc96f19768c7a99541258796c783b3`, registry `b69dbf3862c7114e76ba165e2c7dd306556d4690`. `@d20dao/vrf-sdk@0.6.1` copies protocol source `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`, which holds the same coordinator and registry source. Match the installed SDK's `PROTOCOL-PROVENANCE.json` to the deployment in use. A stable proxy address does not establish unchanged implementation behavior.
+Contract source commits recorded by the manifest: coordinator `f38aaf81c9dc96f19768c7a99541258796c783b3`, registry `b69dbf3862c7114e76ba165e2c7dd306556d4690`. `@d20dao/vrf-sdk@0.6.2` copies protocol source `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`, which holds the same coordinator and registry source. Match the installed SDK's `PROTOCOL-PROVENANCE.json` to the deployment in use. A stable proxy address does not establish unchanged implementation behavior.
 
 Request replay URL: `https://d20dao.org/explorer/request/5042002/0xd20DA0FF9087d053f0291524Eac12abA1ADBd945/<requestId>`.

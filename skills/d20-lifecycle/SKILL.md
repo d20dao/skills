@@ -3,7 +3,7 @@ name: d20-lifecycle
 description: Diagnose d20dao requests on Arc and Robinhood Chain: on-demand publication, drand round binding, VRF deadlines, batch fulfillment, callback retries, fixed-recipient refunds and refund credit from chain evidence.
 ---
 
-Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Diagnose from trusted receipts and state; logs and status output are observations. Read the actual coordinator and registry proxy ABIs, the implementation history for the transactions in question, and the SDK provenance.
 

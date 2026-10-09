@@ -3,7 +3,7 @@ name: d20-keeper
 description: "Protocol rules for operating a d20dao keeper: Arc epoch source selection and fallback, Robinhood Chain round fulfilment, publication timing, implementation pins, backup committers and the keeper share."
 ---
 
-Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Use this only when the user is actually operating a keeper; an integration request is not operator authorization. It states the protocol rules a keeper must satisfy. The keeper's own repository documents how to configure and run it, and a successful setup is not production approval.
 

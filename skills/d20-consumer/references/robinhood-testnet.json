@@ -3,8 +3,8 @@
   "chainId": 46630,
   "coordinatorKind": "round",
   "snapshotDate": "2026-10-09",
-  "sdk": "@d20dao/vrf-sdk@0.6.1",
-  "protocolSourceCommit": "fa6417dc4667cc98e298c4280a4bfe98fc8b7873",
+  "sdk": "@d20dao/vrf-sdk@0.6.2",
+  "protocolSourceCommit": "b733d8d144649bd92a16158fe0b5d48eb6b27b1f",
   "manifest": "https://github.com/d20dao/keeper/blob/main/deployments/robinhood-testnet.json",
   "contracts": {
     "coordinator": {

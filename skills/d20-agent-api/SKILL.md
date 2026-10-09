@@ -3,7 +3,7 @@ name: d20-agent-api
 description: Buy d20dao verifiable randomness over HTTP with x402 on Arc, 0.05 USDC per call through Circle Gateway; operations, the 402 handshake, pending results, errors, seeds and verification.
 ---
 
-Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Use this when an agent or backend needs verifiable randomness and can pay over HTTP, instead of deploying a consumer contract. Each paid call opens one request on the D20DAO coordinator through the API's relay contract and returns the proven result. When the word must reach your own contract, use **d20-consumer**. The API serves Arc only: requests are opened on Arc Mainnet or Arc Testnet. There is no x402 API for Robinhood Chain; integrate there on chain with **d20-consumer** and `@d20dao/vrf-sdk` 0.6.1. Installing this skill authorizes no spending: follow the user's instructions for funding and for mainnet.
 

@@ -3,7 +3,7 @@ name: d20-sdk
 description: "Install and use the published @d20dao/vrf-sdk on Arc and Robinhood Chain: networks, exports, ABIs, Solidity imports, off-chain fee quoting, request reading, mapping and replay helpers."
 ---
 
-Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Install with `npm install @d20dao/vrf-sdk` (0.6.1 or newer for Robinhood Chain; 0.4.0 cannot replay a drand epoch). Use Node >= 22.13 and Solidity 0.8.28. Read the packaged README, AGENTS.md, exported declarations and PROTOCOL-PROVENANCE.json, and match them to the selected deployment's proxy addresses and implementation history. The package is ESM only: bundle it for browsers, or import only `@d20dao/vrf-sdk/abi` when you need just the ABIs. Installing the package does not onboard a consumer; the public service needs no registration. For agents that pay per call over HTTP, see **d20-agent-api**.
 

@@ -106,7 +106,7 @@ Each skill supports explicit invocation and normal automatic discovery. Canonica
 
 Both service contracts use initialized UUPS proxies with two-step ownership; `renounceOwnership` is disabled and upgrade authority is a trust assumption. Verify both implementation histories and runtime pins when you integrate, and again whenever a manifest records an upgrade. Upgrades keep the consumer ABI compatible and keep open requests serviceable.
 
-These guides follow public protocol commit `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`, published as [d20dao/keeper](https://github.com/d20dao/keeper) v0.5.0 and the protocol source of `@d20dao/vrf-sdk@0.6.1`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
+These guides follow public protocol commit `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`, published as [d20dao/keeper](https://github.com/d20dao/keeper) v0.5.1 and the protocol source of `@d20dao/vrf-sdk@0.6.2`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
 
 ## Getting started with an agent
 
