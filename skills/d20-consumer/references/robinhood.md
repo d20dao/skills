@@ -25,7 +25,7 @@ When a request is made, the contract binds it to a future round of drand's evmne
 
 **Delivery and refunds.** A typical delivery takes 5–8 seconds. If a request is not fulfilled within 60 seconds, its fee can be refunded to the request's refund address. As with any randomness service, design applications so that a party cannot cancel a request and retry for a better outcome.
 
-**Upgrades.** The coordinator is upgradeable (UUPS). The owner is currently the deployer account and is moving to a 2-of-2 Safe. Beacon changes are scheduled on chain at least 10 minutes ahead.
+**Upgrades.** The coordinator is upgradeable (UUPS). On mainnet the owner is currently the deployer account and is moving to a 2-of-2 Safe; the testnet stays with the deployer account. Beacon changes are scheduled on chain at least 10 minutes ahead.
 
 ## What is the same as Arc
 
