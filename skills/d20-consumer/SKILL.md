@@ -5,7 +5,7 @@ description: Integrate d20dao randomness consumers on Arc or Robinhood Chain, sa
 
 Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
-Install `@d20dao/vrf-sdk` 0.6.1 or newer and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error.
+Install `@d20dao/vrf-sdk` 0.6.2 or newer and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error.
 
 For agents that pay per call over HTTP, see **d20-agent-api**.
 

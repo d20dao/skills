@@ -5,7 +5,7 @@ description: Buy d20dao verifiable randomness over HTTP with x402 on Arc, 0.05 U
 
 Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
-Use this when an agent or backend needs verifiable randomness and can pay over HTTP, instead of deploying a consumer contract. Each paid call opens one request on the D20DAO coordinator through the API's relay contract and returns the proven result. When the word must reach your own contract, use **d20-consumer**. The API serves Arc only: requests are opened on Arc Mainnet or Arc Testnet. There is no x402 API for Robinhood Chain; integrate there on chain with **d20-consumer** and `@d20dao/vrf-sdk` 0.6.1. Installing this skill authorizes no spending: follow the user's instructions for funding and for mainnet.
+Use this when an agent or backend needs verifiable randomness and can pay over HTTP, instead of deploying a consumer contract. Each paid call opens one request on the D20DAO coordinator through the API's relay contract and returns the proven result. When the word must reach your own contract, use **d20-consumer**. The API serves Arc only: requests are opened on Arc Mainnet or Arc Testnet. There is no x402 API for Robinhood Chain; integrate there on chain with **d20-consumer** and `@d20dao/vrf-sdk` 0.6.2. Installing this skill authorizes no spending: follow the user's instructions for funding and for mainnet.
 
 ## Endpoints and price
 
@@ -139,7 +139,7 @@ A fulfilled answer carries `requestId`, `result`, `randomness`, `clientSeed`, `p
 1. Recompute `paymentId = keccak256(abi.encode(uint256 chainId, address payer, bytes32 nonce))` from the authorization you signed, with the payment network's chain id.
 2. `clientSeed` is `keccak256(abi.encode(bytes32 paymentId, string seed))`; on a replacement request (`replaces` is set) it is `keccak256(abi.encode(bytes32 ref, uint256 1))`. It equals `getRequest(requestId).clientSeed` on the coordinator proxy, whose `consumer` is the relay and whose `randomness` is `randomness`.
 3. `getMappedResult(requestId)` equals `result`. Offline, `mapRandomness(randomness, spec)` from `@d20dao/vrf-sdk` reproduces it, where `spec` is `mapping` with `lower` and `upper` as bigint; `hashMapping(spec)` equals `getRequest(requestId).mappingHash`.
-4. Replay the proof with `replayCoordinator` from `@d20dao/vrf-sdk` 0.6.1 or later, as in **d20-verification**. Reading a word over RPC is not proof verification.
+4. Replay the proof with `replayCoordinator` from `@d20dao/vrf-sdk` 0.6.2 or later, as in **d20-verification**. Reading a word over RPC is not proof verification.
 
 Read the coordinator with `coordinatorAbi` from `@d20dao/vrf-sdk/abi` through `https://rpc.mainnet.arc.io` or `https://rpc.testnet.arc.io`.
 

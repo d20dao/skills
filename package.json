@@ -6,7 +6,7 @@
     "check": "node scripts/check-examples.mjs"
   },
   "devDependencies": {
-    "@d20dao/vrf-sdk": "0.6.1",
+    "@d20dao/vrf-sdk": "0.6.2",
     "solc": "0.8.28"
   },
   "overrides": {

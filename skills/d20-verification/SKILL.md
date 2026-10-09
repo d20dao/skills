@@ -5,7 +5,7 @@ description: Verify d20dao evidence on Arc (epochs with drand beacon rounds and 
 
 Public protocol reference: `b733d8d144649bd92a16158fe0b5d48eb6b27b1f`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
-Use the public @d20dao/vrf-sdk, version 0.6.1 or later (0.5.0 or later suffices for Arc alone): 0.4.0 cannot replay a drand epoch and throws `Expected canonical 65-byte low-s EIP-191 signature` on its 64-byte BLS signature. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
+Use the public @d20dao/vrf-sdk, version 0.6.2 or later (0.5.0 or later suffices for Arc alone): 0.4.0 cannot replay a drand epoch and throws `Expected canonical 65-byte low-s EIP-191 signature` on its 64-byte BLS signature. Read its current declarations, provenance and replay/epoch/evidence/mapping sources. Match the reviewed code and both proxy implementations for the relevant transactions; proxy addresses alone do not identify executed logic. Keep keeper/prover keys outside verification.
 
 ## Arc
 

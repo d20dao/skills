@@ -1,6 +1,6 @@
 # Robinhood Chain deployment reference
 
-Robinhood Chain (chain ID **4663**, live service) and Robinhood Chain Testnet (chain ID **46630**, development). Snapshot copied from the deployment manifests on **2026-10-09**: [robinhood-mainnet.json](https://github.com/d20dao/keeper/blob/main/deployments/robinhood-mainnet.json) and [robinhood-testnet.json](https://github.com/d20dao/keeper/blob/main/deployments/robinhood-testnet.json). Machine-readable identities: [robinhood-mainnet.json](robinhood-mainnet.json), [robinhood-testnet.json](robinhood-testnet.json). `D20_NETWORKS['robinhood-mainnet']` and `D20_NETWORKS['robinhood-testnet']` in `@d20dao/vrf-sdk` 0.6.1 carry the same values.
+Robinhood Chain (chain ID **4663**, live service) and Robinhood Chain Testnet (chain ID **46630**, development). Snapshot copied from the deployment manifests on **2026-10-09**: [robinhood-mainnet.json](https://github.com/d20dao/keeper/blob/main/deployments/robinhood-mainnet.json) and [robinhood-testnet.json](https://github.com/d20dao/keeper/blob/main/deployments/robinhood-testnet.json). Machine-readable identities: [robinhood-mainnet.json](robinhood-mainnet.json), [robinhood-testnet.json](robinhood-testnet.json). `D20_NETWORKS['robinhood-mainnet']` and `D20_NETWORKS['robinhood-testnet']` in `@d20dao/vrf-sdk` 0.6.2 carry the same values.
 
 | Contract | Robinhood Chain | Robinhood Chain Testnet |
 | --- | --- | --- |
