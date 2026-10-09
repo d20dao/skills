@@ -1,9 +1,9 @@
 ---
 name: d20-keeper
-description: "Protocol rules for operating a d20dao keeper: epoch source selection and fallback, publication timing, implementation pins, backup committers and the keeper share."
+description: "Protocol rules for operating a d20dao keeper: Arc epoch source selection and fallback, Robinhood Chain round fulfilment, publication timing, implementation pins, backup committers and the keeper share."
 ---
 
-Public protocol reference: `98e537fb249dd0d3365b8d78e6040a9323a65a88`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Use this only when the user is actually operating a keeper; an integration request is not operator authorization. It states the protocol rules a keeper must satisfy. The keeper's own repository documents how to configure and run it, and a successful setup is not production approval.
 
@@ -19,4 +19,6 @@ Use this only when the user is actually operating a keeper; an integration reque
 
 **Recovery.** Reconcile every signed attempt before taking another nonce; a timeout or a missing acknowledgment is not failure. Preserve exact raw bytes and proof calldata across restarts, and keep a replacement on the same nonce, destination and payload. A bounded zero-value self-transaction may clear an unresolved nonce; it publishes, refunds and fulfills nothing. Live previous-epoch demand can still settle without resampling. Public events are the long-term replay source: an unpublished expired local packet has no chain archive.
 
-**Adding a source** is an owner transaction, not an upgrade. The owner registers the recipe (`registerRecipe`, or `registerBeacon` for a beacon) and schedules a catalog listing its id with its signer (`slotSigner(recipe)` for a beacon), at least two epochs ahead. A keeper needs no release for a new signed-record recipe — it reads the definition from the registry — only a gateway for that signer.
+**Robinhood Chain.** The round coordinator has no epochs or registry. Each request binds a future drand evmnet round (`getRoundRequest(id).round`); once drand publishes it, the keeper submits the round's 64-byte signature with the VRF proof of the request's seed (`getProofContext(id, signature)` returns it before the round is cached), alone with `fulfillRandomness(id, proof, roundSignature)` or in `fulfillRandomnessBatch(rounds, ids, proofs)`. The first fulfilment of a round verifies it on chain; later ones may pass an empty signature. Gas must cover the round's verification before anything runs (`InsufficientCallbackGas`), so estimate rather than fix a limit. The keeper share goes to the submitter when it is an allowed backup keeper (`setBackupKeeper`, `isAuthorizedKeeper`) and to `keeper()` otherwise. Pin the coordinator implementation, proof verifier, mapping library and beacon verifier code hashes from the manifest.
+
+**Adding a source** (Arc) is an owner transaction, not an upgrade. The owner registers the recipe (`registerRecipe`, or `registerBeacon` for a beacon) and schedules a catalog listing its id with its signer (`slotSigner(recipe)` for a beacon), at least two epochs ahead. A keeper needs no release for a new signed-record recipe — it reads the definition from the registry — only a gateway for that signer.

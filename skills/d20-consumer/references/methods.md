@@ -1,6 +1,6 @@
 # SDK methods and result semantics
 
-Use `@d20dao/vrf-sdk` 0.5.0 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
+Use `@d20dao/vrf-sdk` 0.6.0 or newer with Solidity 0.8.28. The examples below assume `using D20VRFRequests for ID20VRF;` and `o = D20VRFRequests.Options(clientSeed, callbackGasLimit, refundAddress)` inside the application contract. Every helper pays `rng.quoteFee(o.callbackGasLimit)` from the calling contract's balance, so check `msg.value >= rng.quoteFee(callbackGasLimit)` (or fund the contract) before calling one.
 
 | Result | TypeScript mapping spec | Solidity request helper | Returned values |
 | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ One word is 256 bits, so one request covers an operation that needs several valu
 
 ## Quote and pay the fee
 
-`fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))`, in native USDC with 18 decimals. `pricing()` returns `(minFee, feeMultiplier, fulfillGasOverhead)`; the owner can change them within bounds (minFee at most 10 USDC, multiplier 0–20, overhead 100,000–2,000,000 gas) and each change emits `PricingChanged`. The transaction's own `block.basefee` prices the request, so `quoteFee(callbackGasLimit)` is exact only inside the requesting transaction.
+`fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))`, in the native token with 18 decimals: USDC on Arc, ETH on Robinhood Chain. `pricing()` returns `(minFee, feeMultiplier, fulfillGasOverhead)`; the owner can change them within bounds (minFee at most 10 USDC, multiplier 0–20, overhead 100,000–2,000,000 gas) and each change emits `PricingChanged`. The transaction's own `block.basefee` prices the request, so `quoteFee(callbackGasLimit)` is exact only inside the requesting transaction.
 
 Off-chain quoting example (ethers v6): read `baseFeePerGas` from the latest block, call `quoteFeeAt(callbackGasLimit, baseFeePerGas)`, then send the quote recomputed at a buffered base fee. The SDK's `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` returns both the exact quote for that header (`fee`) and the buffered amount to send (`value`). Do not call `quoteFee` through `eth_call`: it commonly reports a base fee of 0 and returns only `minFee`.
 
@@ -35,6 +35,8 @@ Labelled example with the initialization values, which Arc Testnet still uses (0
 | 200 gwei quoted with a 30% buffer (260 gwei) | 0.52 USDC sent | 0.40 USDC paid; 0.12 USDC credited to the refund address |
 
 Since 2026-09-18 Arc Mainnet charges a 0.02 USDC minimum fee, multiplier 3 and overhead 300,000 gas. At a 20 gwei base fee and `callbackGasLimit` 100,000 it charges 3 × 20 gwei × 400,000 = 0.024 USDC.
+
+Both Robinhood Chain deployments started with a 0.000025 ETH minimum fee, multiplier 2 and overhead 405,000 gas. At a 0.02 gwei base fee and `callbackGasLimit` 100,000 the dynamic part is 2 × 0.02 gwei × 505,000 = 0.0000202 ETH, so the request pays 0.000025 ETH. `quoteRequestFee` works the same way there.
 
 Payment below the transaction's quote reverts with `IncorrectFee(expected, actual)` and creates no request. Excess is credited to the refund address (`FeeOverpaymentCredited(requestId, refundAddress, amount)`) and withdrawn by that address with `withdrawRefundCredit(recipient)`; the coordinator never keeps it. `RandomnessRequested` carries `feePaid`; `requestFeePaid(id)` and `requestRefundBps(id)` return the escrowed fee and the refund ratio snapshotted for that request.
 
@@ -82,11 +84,13 @@ for (;;) {
 }
 ```
 
-`fulfilled` means the word is final. `delivered` only reports the callback: a fulfilled request with `delivered` false keeps its word, and `retryCallback` delivers it again. If the keeper publishes no epoch packet or proof before the deadline, for any reason, the request expires and is never fulfilled late. Reading a word over RPC is not proof verification. Events carry the same information: `RandomnessFulfilled(requestId, randomness, submitter)`, `CallbackAttempted(requestId, success, gasLimit)` and `RequestRefundedTo(requestId, refundAddress, amount, paid)`.
+On Robinhood Chain replace `coordinatorAbi` with `roundCoordinatorAbi` and `getRequest` with `getRoundRequest`; or, on either chain, call `readRequest(provider, D20_NETWORKS[name], requestId)` from the SDK, which reads the block first and returns `status` (`pending`, `fulfilled`, `expired`, `refunded`) and `randomness`.
+
+`fulfilled` means the word is final. `delivered` only reports the callback: a fulfilled request with `delivered` false keeps its word, and `retryCallback` delivers it again. If the keeper delivers no proof (on Arc, also no epoch packet) before the deadline, for any reason, the request expires and is never fulfilled late. Reading a word over RPC is not proof verification. Events carry the same information: `RandomnessFulfilled(requestId, randomness, submitter)`, `CallbackAttempted(requestId, success, gasLimit)` and `RequestRefundedTo(requestId, refundAddress, amount, paid)`.
 
 ## Recovery gas limits
 
-`refundRequest`, `retryCallback` and `retryRefundCallback` need no value or role, but revert with `InsufficientCallbackGas` rather than forward less gas to the consumer. Measured minimum transaction gas limits and suggested values (SDK README, "Gas for refund and retry calls"):
+`refundRequest`, `retryCallback` and `retryRefundCallback` need no value or role, but revert with `InsufficientCallbackGas` rather than forward less gas to the consumer. Measured minimum transaction gas limits and suggested values on Arc (SDK README, "Gas for refund and retry calls"); on Robinhood Chain they were not measured, so use `eth_estimateGas` with a margin:
 
 | Call | Measured minimum | Suggested gas limit |
 | --- | --- | --- |
@@ -99,7 +103,7 @@ for (;;) {
 ## Front ends
 
 - Bundle the ESM-only SDK (Vite, webpack, esbuild) or import only `@d20dao/vrf-sdk/abi` when you need just the ABIs.
-- Add the network with `wallet_addEthereumChain`, native currency `{ name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet chain ID `0x13b2`, RPC `https://rpc.mainnet.arc.io`, explorer `https://explorer.arc.io`; Arc Testnet chain ID `0x4cef52`, RPC `https://rpc.testnet.arc.io`, explorer `https://testnet.arcscan.app`.
+- Add the network with `wallet_addEthereumChain`, native currency `{ name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet chain ID `0x13b2`, RPC `https://rpc.mainnet.arc.io`, explorer `https://explorer.arc.io`; Arc Testnet chain ID `0x4cef52`, RPC `https://rpc.testnet.arc.io`, explorer `https://testnet.arcscan.app`. Robinhood Chain uses native currency `{ name: 'Ether', symbol: 'ETH', decimals: 18 }`: chain ID `0x1237`, RPC `https://rpc.mainnet.chain.robinhood.com`, explorer `https://robinhoodchain.blockscout.com`; testnet chain ID `0xb626`, RPC `https://rpc.testnet.chain.robinhood.com`, explorer `https://explorer.testnet.chain.robinhood.com`.
 - Coordinator custom errors pass through the consumer's call. Decode revert data with `coordinator.interface.parseError(data)` or add the coordinator's error entries to the consumer ABI; `OnlyCoordinator` is in the consumer ABI only. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists each error's selector and response.
 - ethers v6 returns structs as `Result` arrays. A field named like an `Array` or `Result` member (`values`, `length`, `map`, `keys`) is shadowed; read it with `result.getValue(name)`, by position or from `result.toObject()`.
 - Public Arc RPC endpoints are on `*.arc.io`, which common browser ad-block filter lists block, so direct read-only calls fail with `net::ERR_BLOCKED_BY_CLIENT` for many users. Read through the connected wallet's EIP-1193 provider after checking its chain ID, or through a same-origin read-only JSON-RPC relay that forwards only read methods, such as the demo's [worker/index.js](https://github.com/d20dao/randomizer-demo/blob/main/worker/index.js).

@@ -1,11 +1,13 @@
 ---
 name: d20-lifecycle
-description: Diagnose d20dao on-demand publication, VRF deadlines, batch fulfillment, callback retries, fixed-recipient refunds and refund credit from chain evidence.
+description: Diagnose d20dao requests on Arc and Robinhood Chain: on-demand publication, drand round binding, VRF deadlines, batch fulfillment, callback retries, fixed-recipient refunds and refund credit from chain evidence.
 ---
 
-Public protocol reference: `98e537fb249dd0d3365b8d78e6040a9323a65a88`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
 Diagnose from trusted receipts and state; logs and status output are observations. Read the actual coordinator and registry proxy ABIs, the implementation history for the transactions in question, and the SDK provenance.
+
+## Arc
 
 Idle epochs produce no publication transaction, so an unpublished idle epoch is normal. Before initial activation requests revert; afterwards a paid request escrows the fee quoted in its own transaction (`RandomnessRequested.feePaid`, `requestFeePaid(id)`) while it waits for the epoch packet. Publication accepts a record (a signed record, or a drand round at its scheduled time) that is not future-dated and at most 240 seconds old at the publication block, then resolves `targetBlock = max(requestBlock, commitBlock + 1)`; there is no usable seed before that future block hash. A saved signed record is never refreshed to obtain another result, so once it ages past 240 seconds its live demand expires and refunds; a saved drand round that is too old is replaced by a current round, and only while no commit of its epoch has been sent. The drand catalog has one source and no fallback. An older epoch can still publish for timely pending demand across a boundary. Each epoch uses the source catalog in force for it: a newly scheduled catalog applies only to epochs at least two ahead and never changes a current epoch or an open request.
 
@@ -26,6 +28,20 @@ Acceptance exactly at `requestedAt + 60` seconds is timely; refunds require stri
 Each request settles from its own snapshots: `requestFeePaid(id)` fixes the amount that keeper share, treasury share and refund are computed from, and `requestRefundBps(id)` fixes the refund ratio. Live `pricing()` and `refundBps()` apply only to later requests. `keeperFeeBps()` is not snapshotted: the split uses its value at acceptance, including for requests opened before a change. Classify from per-request events (RandomnessRequested, RandomnessFulfilled, FulfillmentEvidence, CallbackAttempted, KeeperFeePaid, RequestRefundedTo), never from fulfillment calldata: one batch transaction carries up to 16 proofs. Keep request fees, application refunds, callback delivery, keeper credits and refund credits apart — the full coordinator ABI holds the recovery functions that `ID20VRF` omits.
 
 An implementation upgrade keeps open requests serviceable and the consumer ABI compatible. It is never a reason to reroll, to extend a deadline or to bypass the refund path. A read-only diagnosis does not authorize gas or administration; prepare concrete authorized calls instead.
+
+## Robinhood Chain
+
+There is no epoch publication. A request binds, when it is made, the first drand evmnet round scheduled at least 3 seconds after its block's timestamp (`RoundAssigned(requestId, beaconId, round)`, `getRoundRequest(id).round`). The keeper fulfils with that round's BLS signature and a VRF proof; the first fulfilment of a round verifies the signature on chain and emits `RoundVerified`, and later requests of the round read the cached randomness. A typical delivery takes 5–8 seconds. Read state with `getRoundRequest(id)` or the SDK's `readRequest`, which returns `pending`, `fulfilled`, `expired` or `refunded`.
+
+| State | Meaning and recovery |
+| --- | --- |
+| Pending, `roundRandomness` zero, deadline live | Normal: the round is not published or not verified yet. Wait up to the deadline. |
+| Pending, `roundRandomness` set, deadline live | The round is verified (another request of it was served); this request's proof can still be accepted. |
+| Fulfilled, callback failed | As on Arc: the word is final and earned; `retryCallback` redelivers it. |
+| Unfulfilled strictly after deadline | As on Arc: `refundRequest` pays `feePaid × refundBps / 10000` (100% at deployment) to the fixed refund address or its refund credit. |
+| `KeeperFeePaid` names an unexpected wallet | Expected: the share goes to the submitter when it is an allowed backup keeper and to `keeper()` otherwise. |
+
+Fees, refund credit, retries and the refund notification work as on Arc; recovery gas was measured on Arc only, so on Robinhood Chain use `eth_estimateGas` with a margin. A request sent through Ethereum's delayed inbox rather than the sequencer takes an earlier timestamp and may bind a round that is already public; send requests as normal transactions.
 
 ## Refund notification
 

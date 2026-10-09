@@ -1,11 +1,11 @@
 ---
 name: d20-consumer
-description: Integrate d20dao randomness consumers, same-transaction fee quotes, refund credit, authenticated callbacks and deterministic mappings into an application.
+description: Integrate d20dao randomness consumers on Arc or Robinhood Chain, same-transaction fee quotes, refund credit, authenticated callbacks and deterministic mappings into an application.
 ---
 
-Public protocol reference: `98e537fb249dd0d3365b8d78e6040a9323a65a88`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
+Public protocol reference: `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`. Match the installed SDK provenance and the deployed implementation history before use; each deployment manifest records the source its implementations were deployed and upgraded from.
 
-Install `@d20dao/vrf-sdk` 0.5.0 or newer and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error.
+Install `@d20dao/vrf-sdk` 0.6.0 or newer and read its packaged README, AGENTS.md, declarations and provenance; its `ID20VRF` exposes `quoteFee`, `quoteFeeAt`, `requestRandomness`, `requestMappedRandomness` and `getMappedResult`. The [SDK API reference](https://github.com/d20dao/d20-sdk/blob/main/API.md) lists every coordinator and registry function, event and error with its selector, caller and what to do on each error.
 
 For agents that pay per call over HTTP, see **d20-agent-api**.
 
@@ -15,6 +15,7 @@ Inspect the existing contract's authorization, storage/initializer design and se
 
 - Arc Mainnet (live): [deployment addresses](references/arc-mainnet.md) and [machine-readable identities](references/arc-mainnet.json).
 - Arc Testnet: [deployment addresses](references/arc-testnet.md) and [machine-readable identities](references/arc-testnet.json). Configure the coordinator proxy, not an implementation or the restricted cost client.
+- Robinhood Chain (live) and Robinhood Chain Testnet: [deployment reference, how it works and differences from Arc](references/robinhood.md), with [mainnet](references/robinhood-mainnet.json) and [testnet](references/robinhood-testnet.json) identities. The same consumer code works there; fees are in ETH and requests are read with `getRoundRequest`.
 - [Methods and semantics](references/methods.md): fee quoting, built-in signatures, bounds, list commitments, reading results, recovery gas and front ends.
 - [RandomnessConsumer.sol](assets/RandomnessConsumer.sol): a constructor-based consumer that pays the same-transaction quote, returns change to the payer, acts as its own refund address, credits refunded fees to requesters and pulls coordinator refund credit. Add real eligibility rules; its public entry points do not decide who may obtain an application outcome.
 - [mappings.mjs](assets/mappings.mjs): SDK mapping specs and deterministic outputs. A mapped word alone does not verify a proof.
@@ -35,7 +36,7 @@ For an upgradeable application, preserve its initializer and storage layout: the
 
 ## Pay the quoted fee
 
-`fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))` in native USDC (18 decimals). `pricing()` returns the live parameters; the owner can change them within fixed bounds (`PricingChanged`).
+`fee = max(minFee, feeMultiplier × baseFee × (fulfillGasOverhead + callbackGasLimit))` in the native token: USDC on Arc, ETH on Robinhood Chain, both 18 decimals. `pricing()` returns the live parameters; the owner can change them within fixed bounds (`PricingChanged`).
 
 - In the requesting transaction, `quoteFee(callbackGasLimit)` is exact: forward exactly that value, or let a `D20VRFRequests` helper pay it from the contract balance. Require `msg.value >= fee` and return or account for the difference.
 - Off-chain, `quoteFee` through `eth_call` commonly sees a base fee of 0 and returns only `minFee`, so the real transaction reverts. Quote `quoteFeeAt(callbackGasLimit, latestBlock.baseFeePerGas)`, add a buffer for base-fee movement, and send at least that. The SDK's `quoteRequestFee(provider, coordinator, callbackGasLimit, { bufferBps })` does both.
@@ -46,20 +47,20 @@ Choose the refund address deliberately. A consumer contract that is the refund a
 
 ## Lifecycle, results and recovery
 
-A request escrows its quoted fee even if the epoch packet is not published yet, and fixes its request block, epoch, mapping, refund address and 60-second deadline. Multiple requests may be fulfilled in one batch transaction with unchanged per-request events.
+A request escrows its quoted fee and fixes its request block, mapping, refund address and 60-second deadline, and on Arc its epoch (even if the epoch packet is not published yet), on Robinhood Chain its future drand round. Multiple requests may be fulfilled in one batch transaction with unchanged per-request events.
 
 - Take `requestId` from the coordinator's `RandomnessRequested` log in the request receipt, filtered by coordinator address and event name (`FeeOverpaymentCredited` comes first when there is excess), or return it from the consumer.
-- Poll by reading the latest block first and then `getRequest(requestId)` from `coordinatorAbi`. `fulfilled` means the word is final: read `getMappedResult(requestId)` (it reverts `NotFulfilled` before) or the consumer's stored word. `delivered` only reports that the callback succeeded. Not fulfilled with a block timestamp after `deadline` means expired. Single requests are normally fulfilled within a few seconds, but wait up to the deadline; timings are not an SLA.
+- Poll by reading the latest block first and then `getRequest(requestId)` from `coordinatorAbi` on Arc, or `getRoundRequest(requestId)` from `roundCoordinatorAbi` on Robinhood Chain; the SDK's `readRequest(provider, D20_NETWORKS[name], requestId)` does both and returns `pending`, `fulfilled`, `expired` or `refunded`. `fulfilled` means the word is final: read `getMappedResult(requestId)` (it reverts `NotFulfilled` before) or the consumer's stored word. `delivered` only reports that the callback succeeded. Not fulfilled with a block timestamp after `deadline` means expired. Single requests are normally fulfilled within a few seconds, but wait up to the deadline; timings are not an SLA.
 - Mapped callbacks still deliver raw words. Read `getMappedResult` or map off-chain with the original spec; `d20` maps to 1 through 20.
 - Acceptance at or before `requestedAt + 60` seconds is timely; a failed callback still earns service payment and `retryCallback` redelivers only the same result. Strictly after the deadline, `refundRequest(id)` pays `feePaid × refundBps / 10000` to the fixed refund address or records it as refund credit (default 100%; the owner may lower the ratio to no less than 50% for future requests only).
-- Recovery calls revert `InsufficientCallbackGas` instead of forwarding less gas. Transaction gas limits: `refundRequest` 400,000; `retryCallback(id, gasLimit)` `gasLimit + 250,000`; `retryRefundCallback(id, gasLimit)` `gasLimit + 150,000`. Size `callbackGasLimit` by measuring the callback (a new storage slot costs about 22,100 gas) and adding a margin.
+- Recovery calls revert `InsufficientCallbackGas` instead of forwarding less gas. Transaction gas limits on Arc (on Robinhood Chain use `eth_estimateGas` with a margin): `refundRequest` 400,000; `retryCallback(id, gasLimit)` `gasLimit + 250,000`; `retryRefundCallback(id, gasLimit)` `gasLimit + 150,000`. Size `callbackGasLimit` by measuring the callback (a new storage slot costs about 22,100 gas) and adding a margin.
 - Override `_onRefund(uint256 requestId)` to react to refunds; the base authenticates the coordinator. Keep it within 100,000 gas and update only bounded state. The notice means paid or credited to the fixed refund address, not necessarily to this consumer; read `requestFeePaid` and `requestRefundBps` for the amount. Reentry into coordinator request, refund and retry paths is rejected, so any new request belongs in a later transaction.
 
 ## Front ends
 
-- Add the network with `wallet_addEthereumChain` and `nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet `chainId: '0x13b2'` (5042), Arc Testnet `chainId: '0x4cef52'` (5042002).
+- Add the network with `wallet_addEthereumChain` and `nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 }`: Arc Mainnet `chainId: '0x13b2'` (5042), Arc Testnet `chainId: '0x4cef52'` (5042002). Robinhood Chain uses `nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 }` with `chainId: '0x1237'` (4663) or `'0xb626'` (46630).
 - Coordinator reverts pass through the consumer's call unchanged. Decode them with `coordinatorAbi` (`coordinator.interface.parseError(data)` in ethers); the API reference gives the response to each error.
 - ethers v6 structs are `Result` arrays: a field named like an array member, such as `values` or `length`, is shadowed; use `result.getValue(name)` or `result.toObject()`.
 - Public Arc RPC endpoints are blocked by common browser ad-block lists (`net::ERR_BLOCKED_BY_CLIENT`) and some reject large JSON-RPC batches. Read through the connected wallet's provider or a same-origin read-only relay, and lower ethers' `batchMaxCount`; details in [methods](references/methods.md#front-ends).
 
-Both service contracts use owner-authorized UUPS upgrades and two-step ownership; `renounceOwnership` is disabled, and upgrade authority is a trust assumption. Administrable without an upgrade: the registry committer and backup committers, registered recipes and beacons, epoch catalogs, the coordinator payout recipient and keeper share, bounded pricing and the refund ratio. There is no request-input or VRF-key override. Upgrades keep the consumer ABI compatible and keep serving requests that were open when they executed, so an upgrade is not a reason to change integration code — but verify deployed code and implementation pins when you integrate, and again whenever the manifest records an upgrade or a proxy emits `Upgraded(implementation)`.
+Both service contracts use owner-authorized UUPS upgrades and two-step ownership; `renounceOwnership` is disabled, and upgrade authority is a trust assumption. On Arc, administrable without an upgrade: the registry committer and backup committers, registered recipes and beacons, epoch catalogs, the coordinator payout recipient and keeper share, bounded pricing and the refund ratio. There is no request-input or VRF-key override. Upgrades keep the consumer ABI compatible and keep serving requests that were open when they executed, so an upgrade is not a reason to change integration code — Robinhood Chain's trust model is in its [deployment reference](references/robinhood.md#how-a-result-is-made). In both cases verify deployed code and implementation pins when you integrate, and again whenever the manifest records an upgrade or a proxy emits `Upgraded(implementation)`.

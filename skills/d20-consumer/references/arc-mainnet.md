@@ -19,6 +19,6 @@ Owner and fee recipient: the DAO treasury Safe `0xB57f656149749eff6b496dF0903364
 
 Read `pricing()` and `keeperFeeBps()` at the coordinator; native USDC uses 18 decimals. Any consumer contract can request service by paying its quoted fee (see [methods](methods.md)); no allowlist is required. Mainnet requests spend real USDC: test on Arc Testnet first and follow the user's instructions for deployment and funding.
 
-Contract source commits recorded by the manifest: coordinator `f38aaf81c9dc96f19768c7a99541258796c783b3`, registry `b69dbf3862c7114e76ba165e2c7dd306556d4690`. `@d20dao/vrf-sdk@0.5.0` copies protocol source `98e537fb249dd0d3365b8d78e6040a9323a65a88`, which holds the same coordinator and registry source. A stable proxy address does not establish unchanged implementation behavior.
+Contract source commits recorded by the manifest: coordinator `f38aaf81c9dc96f19768c7a99541258796c783b3`, registry `b69dbf3862c7114e76ba165e2c7dd306556d4690`. `@d20dao/vrf-sdk@0.6.0` copies protocol source `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`, which holds the same coordinator and registry source. A stable proxy address does not establish unchanged implementation behavior.
 
 Request replay URL: `https://d20dao.org/explorer/request/5042/0xd20da057469C45928912d983F45790C41e290571/<requestId>`.
