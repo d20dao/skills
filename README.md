@@ -10,7 +10,7 @@ On Robinhood Chain, each request is bound to a future drand round when it is mad
 npm install @d20dao/vrf-sdk
 ```
 
-Use `@d20dao/vrf-sdk` 0.6.0 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
+Use `@d20dao/vrf-sdk` 0.6.1 or newer, Node 22.13+ and Solidity 0.8.28 (EVM version `cancun`). Copy the relevant skill folder into your agent's skill directory, keeping its references and assets together, or point the agent directly at its SKILL.md.
 
 - [Primary consumer skill](skills/d20-consumer/SKILL.md)
 - [Compile-ready consumer](skills/d20-consumer/assets/RandomnessConsumer.sol): raw, mapped and shuffle requests paying the same-transaction quote, authenticated delivery, refund notification and refund-credit withdrawal
@@ -79,7 +79,7 @@ The epoch source catalog is an on-chain, owner-managed recipe registry. Since ep
 Use the d20-consumer skill from https://github.com/d20dao/skills to add
 D20DAO randomness to my existing contract. Inspect its architecture and
 preserve authorization, storage, initialization and application payments.
-Install @d20dao/vrf-sdk 0.6.0 or newer, read its AGENTS.md and provenance,
+Install @d20dao/vrf-sdk 0.6.1 or newer, read its AGENTS.md and provenance,
 and select the deployment for my chain (Arc or Robinhood Chain). Pay quoteFee(callbackGasLimit) in
 the requesting transaction, quote off-chain with quoteFeeAt plus a buffer,
 handle refund credit, and implement request-to-operation association,
@@ -106,7 +106,7 @@ Each skill supports explicit invocation and normal automatic discovery. Canonica
 
 Both service contracts use initialized UUPS proxies with two-step ownership; `renounceOwnership` is disabled and upgrade authority is a trust assumption. Verify both implementation histories and runtime pins when you integrate, and again whenever a manifest records an upgrade. Upgrades keep the consumer ABI compatible and keep open requests serviceable.
 
-These guides follow public protocol commit `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`, published as [d20dao/keeper](https://github.com/d20dao/keeper) v0.5.0 and the protocol source of `@d20dao/vrf-sdk@0.6.0`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
+These guides follow public protocol commit `fa6417dc4667cc98e298c4280a4bfe98fc8b7873`, published as [d20dao/keeper](https://github.com/d20dao/keeper) v0.5.0 and the protocol source of `@d20dao/vrf-sdk@0.6.1`; each deployment manifest records the source its implementations were deployed and upgraded from. `npm run check` compares the deployment snapshots in `skills/d20-consumer/references/` with the installed package, so update them together with an SDK release.
 
 ## Getting started with an agent
 
